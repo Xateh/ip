@@ -42,9 +42,29 @@ public class Meep {
                 }
                 break;
             default:
-                tasks.add(new Task(message));
-                response = "added: " + message;
-                // printBordered("Sorry, I don't understand that.");
+                if (message.startsWith("mark ")) {
+                    String taskNumber = message.substring(5);
+                    try {
+                        int index = Integer.parseInt(taskNumber) - 1;
+                        tasks.get(index).markDone();
+                        response = "Task " + taskNumber + " marked as done.\n" + tasks.get(index);
+                    } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                        response = "Invalid task number.";
+                    }
+                } else if (message.startsWith("unmark ")) {
+                    String taskNumber = message.substring(7);
+                    try {
+                        int index = Integer.parseInt(taskNumber) - 1;
+                        tasks.get(index).markNotDone();
+                        response = "Task " + taskNumber + " marked as not done.\n" + tasks.get(index);
+                    } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                        response = "Invalid task number.";
+                    }
+                } else {
+                    tasks.add(new Task(message));
+                    response = "added: " + message;
+                    // printBordered("Sorry, I don't understand that.");
+                }
         }
         printBordered(response);
     }
