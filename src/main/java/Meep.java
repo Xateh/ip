@@ -1,6 +1,9 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Meep {
+    private static ArrayList<String> messages = new ArrayList<>();
+
     private static void printBorder() { System.out.println("-".repeat(50)); }
 
     private static void printGreeting() { printBordered("Hello from Meep!\nWhat can I do for you?"); }
@@ -20,7 +23,8 @@ public class Meep {
         String input = "";
         input = scanner.nextLine();
         while (!input.equals("bye")) {
-            printBordered(input);
+            messages.add(input);
+            printBordered("added: " + input);
             input = scanner.nextLine();
         }
         printFarewell();
