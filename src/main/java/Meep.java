@@ -16,16 +16,38 @@ public class Meep {
         printBorder();
     }
 
+    private static void processMessage(String message) {
+        switch (message) {
+            case "hello":
+                printBordered("Hello there!");
+                break;
+            case "how are you?":
+                printBordered("I'm just a program, but thanks for asking!");
+                break;
+            case "list":
+                String response = "Here are all the messages I've received:";
+                int num = 1;
+                for (String msg : messages) {
+                    response += "\n " + (num++) + ". " + msg;
+                }
+                printBordered(response);
+                break;
+            default:
+                messages.add(message);
+                printBordered("added: " + message);
+                // printBordered("Sorry, I don't understand that.");
+        }
+    }
+
     public static void main(String[] args) {
         printGreeting();
 
         Scanner scanner = new Scanner(System.in);
-        String input = "";
-        input = scanner.nextLine();
-        while (!input.equals("bye")) {
-            messages.add(input);
-            printBordered("added: " + input);
-            input = scanner.nextLine();
+        String message = "";
+        message = scanner.nextLine();
+        while (!message.equals("bye")) {
+            processMessage(message);
+            message = scanner.nextLine();
         }
         printFarewell();
         scanner.close();
