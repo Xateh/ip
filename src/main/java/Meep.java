@@ -3,6 +3,7 @@ import java.util.Scanner;
 
 public class Meep {
     private static ArrayList<String> messages = new ArrayList<>();
+    private static ArrayList<Task> tasks = new ArrayList<>();
 
     private static void printBorder() { System.out.println("-".repeat(50)); }
 
@@ -17,26 +18,35 @@ public class Meep {
     }
 
     private static void processMessage(String message) {
+        messages.add(message);
+        String response;
+        int num = 1;
+
         switch (message) {
             case "hello":
-                printBordered("Hello there!");
+                response = "Hello there!";
                 break;
             case "how are you?":
-                printBordered("I'm just a program, but thanks for asking!");
+                response = "I'm just a program, but thanks for asking!";
                 break;
-            case "list":
-                String response = "Here are all the messages I've received:";
-                int num = 1;
+            case "list messages":
+                response = "Here are all the messages I've received:";
                 for (String msg : messages) {
                     response += "\n " + (num++) + ". " + msg;
                 }
-                printBordered(response);
+                break;
+            case "list":
+                response = "Here are all the tasks:";
+                for (Task task : tasks) {
+                    response += "\n " + (num++) + ". " + task;
+                }
                 break;
             default:
-                messages.add(message);
-                printBordered("added: " + message);
+                tasks.add(new Task(message));
+                response = "added: " + message;
                 // printBordered("Sorry, I don't understand that.");
         }
+        printBordered(response);
     }
 
     public static void main(String[] args) {
@@ -51,5 +61,36 @@ public class Meep {
         }
         printFarewell();
         scanner.close();
+    }
+
+    private static class Task {
+        private String task;
+        private boolean done;
+
+        public Task(String task) {
+            this.task = task;
+            this.done = false;
+        }
+
+        public String getTask() {
+            return task;
+        }
+
+        public boolean isDone() {
+            return done;
+        }
+
+        public void markDone() {
+            done = true;
+        }
+
+        public void markNotDone() {
+            done = false;
+        }
+
+        @Override
+        public String toString() {
+            return (isDone() ? "[X] " : "[ ] ") + getTask();
+        }
     }
 }
