@@ -20,7 +20,7 @@ public class Meep {
 
     private static void processMessage(String message) {
         messages.add(message);
-        String response;
+        String response = "";
         int num = 0;
 
         switch (message) {
@@ -42,6 +42,17 @@ public class Meep {
                     response += "\n " + (++num) + ". " + task;
                 }
                 response += "\nNow you have " + num + " tasks in the list.";
+                break;
+            case "help":
+                response = "Here are the list of commands! [case-sensitive]\n\n";
+                response += "hello:\n\tGreet the program! be polite :)\n";
+                response += "how are you?:\n\tAsk the program how it is doing\n";
+                response += "list messages:\n\tList all messages received\n";
+                response += "list:\n\tList all tasks\n";
+                response += "help:\n\tShow this help message\n";
+                response += "todo <todo description>: \n\tAdd a Todo Task to task list\n";
+                response += "deadline <deadline description> /by <deadline time>: \n\tAdd a Deadline Task to task list\n";
+                response += "event <event description> /from <start time> /to <end time>: \n\tAdd an Event Task to task list";
                 break;
             default:
                 if (message.startsWith("mark ")) {
@@ -65,16 +76,14 @@ public class Meep {
                 } else if (Arrays.asList("todo", "deadline", "event").contains(message.split(" ", 2)[0])) {
                     Pair<Task, Exception> buildPair = Task.buildTask(message);
                     if (buildPair.second != null)
-                        response = "Invalid task format." + buildPair.second.getMessage();
+                        response = buildPair.second.getMessage();
                     else {
                         tasks.add(buildPair.first);
                         response = "Got it. I've added this task:\n" + buildPair.first;
                         response += "\nNow you have " + tasks.size() + " tasks in the list.";
                     }
-                } else {
-                    response = "Unrecognised command: " + message.split(" ")[0] + " Parrotting...\n";
-                    response += "message";
-                }
+                } else
+                    response = "Unrecognised command: \"" + message.split(" ")[0] + "\" Parrotting...\n" + message;
         }
         printBordered(response);
     }
@@ -97,17 +106,25 @@ public class Meep {
         private String task;
         private boolean done;
 
-        public static Pair<? extends Task, Exception> buildTask(String task) {
-            return task.startsWith("todo ")
+        public static Pair<Task, Exception> buildTask(String task) {
+            try {
+                return task.startsWith("todo ")
                     ? new Pair<>(new ToDoTask(task.substring(5).trim()), null)
                     : task.startsWith("deadline ")
                     ? new Pair<>(new DeadlineTask(task.substring(9).trim()), null)
                     : task.startsWith("event ")
                     ? new Pair<>(new EventTask(task.substring(6).trim()), null)
-                    : new Pair<>(null, new Exception("Invalid task format"));
+                    : new Pair<>(null, new Exception("Specify Task Description: " + task + " <task description>"));
+            } catch (Exception e) {
+                return new Pair<>(null, e);
+            }
         }
 
         private Task(String task) {
+            if (task == null || task.trim().isEmpty()) {
+                throw new IllegalArgumentException("Task Description cannot be null or empty");
+            }
+
             this.task = task;
             this.done = false;
         }
@@ -162,6 +179,9 @@ public class Meep {
 
             public DeadlineTask(String task, String deadline) {
                 super(task);
+                if (deadline == null || deadline.trim().isEmpty()) {
+                    throw new IllegalArgumentException("Deadline cannot be null or empty: Please specify deadline time with /by");
+                }
                 this.deadline = deadline;
             }
 
@@ -185,6 +205,13 @@ public class Meep {
 
             public EventTask(String task, String eventStartTime, String eventEndTime) {
                 super(task);
+                if (eventStartTime == null || eventStartTime.trim().isEmpty()) {
+                    throw new IllegalArgumentException("Event start time cannot be null or empty: Please specify event start time with /from");
+                }
+                if (eventEndTime == null || eventEndTime.trim().isEmpty()) {
+                    throw new IllegalArgumentException("Event end time cannot be null or empty: Please specify event end time with /to");
+                }
+
                 this.eventStartTime = eventStartTime;
                 this.eventEndTime = eventEndTime;
             }
