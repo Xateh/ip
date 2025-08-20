@@ -1,0 +1,22 @@
+hello
+how are you?
+task task
+todo todo
+deadline deadline /by time
+event event /from start /to end
+list
+list messages
+mark 1
+mark 3
+mark 4
+mark 5
+mark -1
+list
+list messages
+unmark 2
+unmark 4
+unmark 5
+unmark -1
+list
+list messages
+bye

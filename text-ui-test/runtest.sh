@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+JAVAC="javac"
+JAVA="java"
+
 # create bin directory if it doesn't exist
 if [ ! -d "../bin" ]
 then
@@ -12,15 +15,30 @@ then
     rm ACTUAL.TXT
 fi
 
+# take flag for prefix
+if [ "$1" == "--prefix" ]; then
+    shift
+    PREFIX=""
+    while [ "$1" != "" ] && [[ "$1" != --* ]]; do
+        PREFIX+="$1 "
+        shift
+    done
+    PREFIX=${PREFIX%% } # remove trailing space
+    JAVAC="$PREFIX $JAVAC"
+    JAVA="$PREFIX $JAVA"
+fi
+
+cd $(dirname $0)
+
 # compile the code into the bin folder, terminates if error occurred
-if ! javac -cp ../src/main/java -Xlint:none -d ../bin ../src/main/java/*.java
+if ! $JAVAC -cp /../src/main/java -Xlint:none -d ../bin ../src/main/java/*.java
 then
     echo "********** BUILD FAILURE **********"
     exit 1
 fi
 
 # run the program, feed commands from input.txt file and redirect the output to the ACTUAL.TXT
-java -classpath ../bin Duke < input.txt > ACTUAL.TXT
+$JAVA -classpath ../bin Meep < input.txt > ACTUAL.TXT
 
 # convert to UNIX format
 cp EXPECTED.TXT EXPECTED-UNIX.TXT
