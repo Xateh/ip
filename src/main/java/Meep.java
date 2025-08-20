@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
+
 
 public class Meep {
     private static ArrayList<String> messages = new ArrayList<>();
@@ -20,7 +22,7 @@ public class Meep {
     private static void processMessage(String message) {
         messages.add(message);
         String response;
-        int num = 1;
+        int num = 0;
 
         switch (message) {
             case "hello":
@@ -32,14 +34,15 @@ public class Meep {
             case "list messages":
                 response = "Here are all the messages I've received:";
                 for (String msg : messages) {
-                    response += "\n " + (num++) + ". " + msg;
+                    response += "\n " + (++num) + ". " + msg;
                 }
                 break;
             case "list":
                 response = "Here are all the tasks:";
                 for (Task task : tasks) {
-                    response += "\n " + (num++) + ". " + task;
+                    response += "\n " + (++num) + ". " + task;
                 }
+                response += "\nNow you have " + num + " tasks in the list.";
                 break;
             default:
                 if (message.startsWith("mark ")) {
@@ -60,10 +63,15 @@ public class Meep {
                     } catch (NumberFormatException | IndexOutOfBoundsException e) {
                         response = "Invalid task number.";
                     }
+                } else if (Arrays.asList("todo", "deadline", "event").contains(message.split(" ", 2)[0])) {
+                    Task newTask = Task.buildTask(message);
+                    tasks.add(newTask);
+                    response = "Got it. I've added this task:\n" + newTask;
+                    response += "\nNow you have " + tasks.size() + " tasks in the list.";
                 } else {
                     tasks.add(new Task(message));
-                    response = "added: " + message;
-                    // printBordered("Sorry, I don't understand that.");
+                    response = "Got it. I've added this task:\n" + new Task(message);
+                    response += "\nNow you have " + tasks.size() + " tasks in the list.";
                 }
         }
         printBordered(response);
@@ -87,7 +95,18 @@ public class Meep {
         private String task;
         private boolean done;
 
-        public Task(String task) {
+        public static Task buildTask(String task) {
+            if (task.startsWith("todo ")) {
+                return new ToDoTask(task.substring(5).trim());
+            } else if (task.startsWith("deadline ")) {
+                return new DeadlineTask(task.substring(9).trim());
+            } else if (task.startsWith("event ")) {
+                return new EventTask(task.substring(6).trim());
+            }
+            return new Task(task);
+        }
+
+        private Task(String task) {
             this.task = task;
             this.done = false;
         }
@@ -111,6 +130,79 @@ public class Meep {
         @Override
         public String toString() {
             return (isDone() ? "[X] " : "[ ] ") + getTask();
+        }
+
+        private static class ToDoTask extends Task {
+            public ToDoTask(String task) {
+                super(task);
+            }
+
+            @Override
+            public String toString() {
+                return "[T]" + super.toString();
+            }
+        }
+
+        private static class DeadlineTask extends Task {
+            private String deadline;
+
+            public DeadlineTask(String task) {
+                super(task.split("/")[0]);
+                for (String command : task.split("/")) {
+                    if (command.startsWith("by")) {
+                        this.deadline = command.substring(3).trim();
+                    }
+                }
+            }
+
+            public DeadlineTask(String task, String deadline) {
+                super(task);
+                this.deadline = deadline;
+            }
+
+            public String getDeadline() {
+                return deadline;
+            }
+
+            @Override
+            public String toString() {
+                return "[D]" + super.toString() + " (by: " + getDeadline() + ")";
+            }
+        }
+
+        private static class EventTask extends Task {
+            private String eventStartTime;
+            private String eventEndTime;
+
+            public EventTask(String task) {
+                super(task.split("/")[0]);
+                for (String command : task.split("/")) {
+                    if (command.startsWith("from")) {
+                        this.eventStartTime = command.substring(5).trim();
+                    } else if (command.startsWith("to")) {
+                        this.eventEndTime = command.substring(3).trim();
+                    }
+                }
+            }
+
+            public EventTask(String task, String eventStartTime, String eventEndTime) {
+                super(task);
+                this.eventStartTime = eventStartTime;
+                this.eventEndTime = eventEndTime;
+            }
+
+            public String getEventStartTime() {
+                return eventStartTime;
+            }
+
+            public String getEventEndTime() {
+                return eventEndTime;
+            }
+
+            @Override
+            public String toString() {
+                return "[E]" + super.toString() + " (from: " + getEventStartTime() + " to: " + getEventEndTime() + ")";
+            }
         }
     }
 }
