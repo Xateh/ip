@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.function.Function;
 
 public class Meep {
     private static ArrayList<String> messages = new ArrayList<>();
@@ -20,39 +21,45 @@ public class Meep {
 
     private static void processMessage(String message) {
         messages.add(message);
-        String response = "";
+        StringBuilder response = new StringBuilder();
         int num = 0;
+
+        Function<String, StringBuilder> appendResponse = x -> response.append(x);
+        Function<String, StringBuilder> appendResponseWithNewLine = x -> response.append("\n").append(x);
 
         switch (message) {
             case "hello":
-                response = "Hello there!";
+                appendResponse.apply("Hello there!");
                 break;
             case "how are you?":
-                response = "I'm just a program, but thanks for asking!";
+                appendResponse.apply("I'm just a program, but thanks for asking!");
                 break;
             case "list messages":
-                response = "Here are all the messages I've received:";
+                appendResponse.apply("Here are all the messages I've received:");
                 for (String msg : messages) {
-                    response += "\n " + (++num) + ". " + msg;
+                    appendResponse.apply("\n " + (++num) + ". " + msg);
                 }
                 break;
             case "list":
-                response = "Here are all the tasks:";
+                appendResponse.apply("Here are all the tasks:");
                 for (Task task : tasks) {
-                    response += "\n " + (++num) + ". " + task;
+                    appendResponse.apply("\n " + (++num) + ". " + task);
                 }
-                response += "\nNow you have " + num + " tasks in the list.";
+                appendResponse.apply("\nNow you have " + num + " tasks in the list.");
                 break;
             case "help":
-                response = "Here are the list of commands! [case-sensitive]\n\n";
-                response += "hello:\n\tGreet the program! be polite :)\n";
-                response += "how are you?:\n\tAsk the program how it is doing\n";
-                response += "list messages:\n\tList all messages received\n";
-                response += "list:\n\tList all tasks\n";
-                response += "help:\n\tShow this help message\n";
-                response += "todo <todo description>: \n\tAdd a Todo Task to task list\n";
-                response += "deadline <deadline description> /by <deadline time>: \n\tAdd a Deadline Task to task list\n";
-                response += "event <event description> /from <start time> /to <end time>: \n\tAdd an Event Task to task list";
+                appendResponseWithNewLine.apply("Here are the list of commands! [case-sensitive]\n");
+                appendResponseWithNewLine.apply("hello:\n\tGreet the program! be polite :)");
+                appendResponseWithNewLine.apply("how are you?:\n\tAsk the program how it is doing");
+                appendResponseWithNewLine.apply("list messages:\n\tList all messages received");
+                appendResponseWithNewLine.apply("list:\n\tList all tasks");
+                appendResponseWithNewLine.apply("help:\n\tShow this help message");
+                appendResponseWithNewLine.apply("todo <todo description>: \n\tAdd a Todo Task to task list");
+                appendResponseWithNewLine.apply("deadline <deadline description> /by <deadline time>: \n\tAdd a Deadline Task to task list");
+                appendResponseWithNewLine.apply("event <event description> /from <start time> /to <end time>: \n\tAdd an Event Task to task list");
+                appendResponseWithNewLine.apply("mark <task number>: \n\tMark a task as done");
+                appendResponseWithNewLine.apply("unmark <task number>: \n\tMark a task as not done");
+                appendResponse.apply("delete <task number>: \n\tDelete a task from the list");
                 break;
             default:
                 if (message.startsWith("mark ")) {
@@ -60,32 +67,41 @@ public class Meep {
                     try {
                         int index = Integer.parseInt(taskNumber) - 1;
                         tasks.get(index).markDone();
-                        response = "Task " + taskNumber + " marked as done.\n" + tasks.get(index);
+                        appendResponse.apply("Task " + taskNumber + " marked as done.\n" + tasks.get(index));
                     } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                        response = "Invalid task number.";
+                        appendResponse.apply("Invalid task number.");
                     }
                 } else if (message.startsWith("unmark ")) {
                     String taskNumber = message.substring(7);
                     try {
                         int index = Integer.parseInt(taskNumber) - 1;
                         tasks.get(index).markNotDone();
-                        response = "Task " + taskNumber + " marked as not done.\n" + tasks.get(index);
+                        appendResponse.apply("Task " + taskNumber + " marked as not done.\n" + tasks.get(index));
                     } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                        response = "Invalid task number.";
+                        appendResponse.apply("Invalid task number.");
+                    }
+                } else if (message.startsWith("delete ")) {
+                    String taskNumber = message.substring(7);
+                    try {
+                        int index = Integer.parseInt(taskNumber) - 1;
+                        tasks.remove(index);
+                        appendResponse.apply("Task " + taskNumber + " deleted.");
+                    } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                        appendResponse.apply("Invalid task number.");
                     }
                 } else if (Arrays.asList("todo", "deadline", "event").contains(message.split(" ", 2)[0])) {
                     Pair<Task, Exception> buildPair = Task.buildTask(message);
                     if (buildPair.second != null)
-                        response = buildPair.second.getMessage();
+                        appendResponse.apply(buildPair.second.getMessage());
                     else {
                         tasks.add(buildPair.first);
-                        response = "Got it. I've added this task:\n" + buildPair.first;
-                        response += "\nNow you have " + tasks.size() + " tasks in the list.";
+                        appendResponseWithNewLine.apply("Got it. I've added this task:\n" + buildPair.first);
+                        appendResponse.apply("\nNow you have " + tasks.size() + " tasks in the list.");
                     }
                 } else
-                    response = "Unrecognised command: \"" + message.split(" ")[0] + "\" Parrotting...\n" + message;
+                    appendResponse.apply("Unrecognised command: \"" + message.split(" ")[0] + "\" Parrotting...\n" + message);
         }
-        printBordered(response);
+        printBordered(response.toString());
     }
 
     public static void main(String[] args) {
