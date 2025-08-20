@@ -146,13 +146,17 @@ public class Meep {
         private static class DeadlineTask extends Task {
             private String deadline;
 
-            public DeadlineTask(String task) {
-                super(task.split("/")[0]);
+            private static String extractDeadline(String task) {
                 for (String command : task.split("/")) {
                     if (command.startsWith("by")) {
-                        this.deadline = command.substring(3).trim();
+                        return command.substring(3).trim();
                     }
                 }
+                return "";
+            }
+
+            public DeadlineTask(String task) {
+                this(task.split("/", 2)[0], extractDeadline(task));
             }
 
             public DeadlineTask(String task, String deadline) {
@@ -175,20 +179,31 @@ public class Meep {
             private String eventEndTime;
 
             public EventTask(String task) {
-                super(task.split("/")[0]);
-                for (String command : task.split("/")) {
-                    if (command.startsWith("from")) {
-                        this.eventStartTime = command.substring(5).trim();
-                    } else if (command.startsWith("to")) {
-                        this.eventEndTime = command.substring(3).trim();
-                    }
-                }
+                this(task.split("/", 2)[0], EventTask.extractStartTime(task), EventTask.extractEndTime(task));
             }
 
             public EventTask(String task, String eventStartTime, String eventEndTime) {
                 super(task);
                 this.eventStartTime = eventStartTime;
                 this.eventEndTime = eventEndTime;
+            }
+
+            private static String extractStartTime(String task) {
+                for (String command : task.split("/")) {
+                    if (command.startsWith("from")) {
+                        return command.substring(5).trim();
+                    }
+                }
+                return "";
+            }
+
+            private static String extractEndTime(String task) {
+                for (String command : task.split("/")) {
+                    if (command.startsWith("to")) {
+                        return command.substring(3).trim();
+                    }
+                }
+                return "";
             }
 
             public String getEventStartTime() {
