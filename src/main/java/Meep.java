@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
-
 public class Meep {
     private static ArrayList<String> messages = new ArrayList<>();
     private static ArrayList<Task> tasks = new ArrayList<>();
@@ -64,14 +63,17 @@ public class Meep {
                         response = "Invalid task number.";
                     }
                 } else if (Arrays.asList("todo", "deadline", "event").contains(message.split(" ", 2)[0])) {
-                    Task newTask = Task.buildTask(message);
-                    tasks.add(newTask);
-                    response = "Got it. I've added this task:\n" + newTask;
-                    response += "\nNow you have " + tasks.size() + " tasks in the list.";
+                    Pair<Task, Exception> buildPair = Task.buildTask(message);
+                    if (buildPair.second != null)
+                        response = "Invalid task format." + buildPair.second.getMessage();
+                    else {
+                        tasks.add(buildPair.first);
+                        response = "Got it. I've added this task:\n" + buildPair.first;
+                        response += "\nNow you have " + tasks.size() + " tasks in the list.";
+                    }
                 } else {
-                    tasks.add(new Task(message));
-                    response = "Got it. I've added this task:\n" + new Task(message);
-                    response += "\nNow you have " + tasks.size() + " tasks in the list.";
+                    response = "Unrecognised command: " + message.split(" ")[0] + " Parrotting...\n";
+                    response += "message";
                 }
         }
         printBordered(response);
@@ -95,15 +97,14 @@ public class Meep {
         private String task;
         private boolean done;
 
-        public static Task buildTask(String task) {
-            if (task.startsWith("todo ")) {
-                return new ToDoTask(task.substring(5).trim());
-            } else if (task.startsWith("deadline ")) {
-                return new DeadlineTask(task.substring(9).trim());
-            } else if (task.startsWith("event ")) {
-                return new EventTask(task.substring(6).trim());
-            }
-            return new Task(task);
+        public static Pair<? extends Task, Exception> buildTask(String task) {
+            return task.startsWith("todo ")
+                    ? new Pair<>(new ToDoTask(task.substring(5).trim()), null)
+                    : task.startsWith("deadline ")
+                    ? new Pair<>(new DeadlineTask(task.substring(9).trim()), null)
+                    : task.startsWith("event ")
+                    ? new Pair<>(new EventTask(task.substring(6).trim()), null)
+                    : new Pair<>(null, new Exception("Invalid task format"));
         }
 
         private Task(String task) {
@@ -220,4 +221,6 @@ public class Meep {
             }
         }
     }
+
+    private record Pair<F, S>(F first, S second) {}
 }
