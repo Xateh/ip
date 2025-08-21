@@ -1,3 +1,7 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -28,26 +32,22 @@ public class Meep {
         Function<String, StringBuilder> appendResponseWithNewLine = x -> response.append("\n").append(x);
 
         switch (message) {
-            case "hello":
-                appendResponse.apply("Hello there!");
-                break;
-            case "how are you?":
-                appendResponse.apply("I'm just a program, but thanks for asking!");
-                break;
-            case "list messages":
+            case "hello" -> appendResponse.apply("Hello there!");
+            case "how are you?" -> appendResponse.apply("I'm just a program, but thanks for asking!");
+            case "list messages" -> {
                 appendResponse.apply("Here are all the messages I've received:");
                 for (String msg : messages) {
                     appendResponse.apply("\n " + (++num) + ". " + msg);
                 }
-                break;
-            case "list":
+            }
+            case "list" -> {
                 appendResponse.apply("Here are all the tasks:");
                 for (Task task : tasks) {
                     appendResponse.apply("\n " + (++num) + ". " + task);
                 }
                 appendResponse.apply("\nNow you have " + num + " tasks in the list.");
-                break;
-            case "help":
+            }
+            case "help" -> {
                 appendResponseWithNewLine.apply("Here are the list of commands! [case-sensitive]\n");
                 appendResponseWithNewLine.apply("hello:\n\tGreet the program! be polite :)");
                 appendResponseWithNewLine.apply("how are you?:\n\tAsk the program how it is doing");
@@ -60,8 +60,8 @@ public class Meep {
                 appendResponseWithNewLine.apply("mark <task number>: \n\tMark a task as done");
                 appendResponseWithNewLine.apply("unmark <task number>: \n\tMark a task as not done");
                 appendResponse.apply("delete <task number>: \n\tDelete a task from the list");
-                break;
-            default:
+            }
+            default -> {
                 if (message.startsWith("mark ")) {
                     String taskNumber = message.substring(5);
                     try {
@@ -100,6 +100,7 @@ public class Meep {
                     }
                 } else
                     appendResponse.apply("Unrecognised command: \"" + message.split(" ")[0] + "\" Parrotting...\n" + message);
+            }
         }
         printBordered(response.toString());
     }
@@ -122,6 +123,43 @@ public class Meep {
         private String task;
         private boolean done;
 
+        public static String saveString(Task task) {
+            ArrayList<String> parts = new ArrayList<>();
+            parts.add(
+                task instanceof ToDoTask
+                            ? "T"
+                            : task instanceof DeadlineTask
+                            ? "D"
+                            : task instanceof EventTask
+                            ? "E"
+                            : ""
+            );
+            parts.add(task.isDone() ? "1" : "0");
+            parts.add(task.getTask());
+            if (task instanceof DeadlineTask) {
+                parts.add(((DeadlineTask) task).getDeadline());
+            } else if (task instanceof EventTask) {
+                EventTask eventTask = (EventTask) task;
+                parts.add(eventTask.getEventStartTime() + "-" + eventTask.getEventEndTime());
+            }
+
+            return String.format("|%s|", String.join("|", parts));
+        }
+
+        private static Task read(String saveString) {
+            String[] parts = saveString.split("|");
+            if (parts.length < 3) {
+                throw new IllegalArgumentException("Invalid task save string: " + saveString);
+            } else {
+                return switch (parts[0]) {
+                    case "T" -> new ToDoTask(parts[2]);
+                    case "D" -> new DeadlineTask(parts[2], parts[3]);
+                    case "E" -> new EventTask(parts[2], parts[3], parts[4]);
+                    default -> throw new IllegalArgumentException("Unknown task type: " + parts[0]);
+                };
+            }
+        }
+
         public static Pair<Task, Exception> buildTask(String task) {
             try {
                 return task.startsWith("todo ")
@@ -137,6 +175,10 @@ public class Meep {
         }
 
         private Task(String task) {
+            this(task, false);
+        }
+
+        private Task(String task, boolean isDone) {
             if (task == null || task.trim().isEmpty()) {
                 throw new IllegalArgumentException("Task Description cannot be null or empty");
             }
@@ -168,7 +210,11 @@ public class Meep {
 
         private static class ToDoTask extends Task {
             public ToDoTask(String task) {
-                super(task);
+                this(task, false);
+            }
+
+            public ToDoTask(String task, boolean isDone) {
+                super(task, isDone);
             }
 
             @Override
@@ -194,7 +240,11 @@ public class Meep {
             }
 
             public DeadlineTask(String task, String deadline) {
-                super(task);
+                this(task, deadline, false);
+            }
+
+            public DeadlineTask(String task, String deadline, boolean isDone) {
+                super(task, isDone);
                 if (deadline == null || deadline.trim().isEmpty()) {
                     throw new IllegalArgumentException("Deadline cannot be null or empty: Please specify deadline time with /by");
                 }
@@ -220,7 +270,12 @@ public class Meep {
             }
 
             public EventTask(String task, String eventStartTime, String eventEndTime) {
-                super(task);
+                this(task, eventStartTime, eventEndTime, false);
+
+            }
+
+            public EventTask(String task, String eventStartTime, String eventEndTime, boolean isDone) {
+                super(task, isDone);
                 if (eventStartTime == null || eventStartTime.trim().isEmpty()) {
                     throw new IllegalArgumentException("Event start time cannot be null or empty: Please specify event start time with /from");
                 }
