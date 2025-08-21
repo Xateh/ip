@@ -10,6 +10,7 @@ import java.util.function.Function;
 public class Meep {
     private static ArrayList<String> messages = new ArrayList<>();
     private static ArrayList<Task> tasks = new ArrayList<>();
+    private static String saveFile = "./data/meep.txt";
 
     private static void printBorder() { System.out.println("-".repeat(50)); }
 
@@ -98,8 +99,43 @@ public class Meep {
                         appendResponseWithNewLine.apply("Got it. I've added this task:\n" + buildPair.first);
                         appendResponse.apply("\nNow you have " + tasks.size() + " tasks in the list.");
                     }
-                } else
+                } else if (message.startsWith("save")) {
+                    try {
+                        File file = new File(saveFile);
+                        if (!file.exists()) {
+                            file.createNewFile();
+                        }
+                        try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
+                            for (Task task : tasks) {
+                                writer.println(Task.saveString(task));
+                            }
+                        }
+                        appendResponse.apply("Tasks saved to " + file.getAbsolutePath());
+                    } catch (IOException e) {
+                        appendResponse.apply("Error saving tasks: " + e.getMessage());
+                    }
+                } else if (message.startsWith("load")) {
+                    try {
+                        File file = new File(saveFile);
+                        if (!file.exists()) {
+                            appendResponse.apply("No saved tasks found.");
+                        } else {
+                            tasks.clear();
+                            try (Scanner fileScanner = new Scanner(file)) {
+                                while (fileScanner.hasNextLine()) {
+                                    String line = fileScanner.nextLine();
+                                    Task task = Task.load(line);
+                                    tasks.add(task);
+                                }
+                            }
+                            appendResponse.apply("Tasks loaded from " + file.getAbsolutePath());
+                        }
+                    } catch (IOException e) {
+                        appendResponse.apply("Error loading tasks: " + e.getMessage());
+                    }
+                } else {
                     appendResponse.apply("Unrecognised command: \"" + message.split(" ")[0] + "\" Parrotting...\n" + message);
+                }
             }
         }
         printBordered(response.toString());
@@ -146,16 +182,16 @@ public class Meep {
             return String.format("|%s|", String.join("|", parts));
         }
 
-        private static Task read(String saveString) {
-            String[] parts = saveString.split("|");
+        private static Task load(String saveString) {
+            String[] parts = saveString.split("\\|");
             if (parts.length < 3) {
                 throw new IllegalArgumentException("Invalid task save string: " + saveString);
             } else {
-                return switch (parts[0]) {
-                    case "T" -> new ToDoTask(parts[2]);
-                    case "D" -> new DeadlineTask(parts[2], parts[3]);
-                    case "E" -> new EventTask(parts[2], parts[3], parts[4]);
-                    default -> throw new IllegalArgumentException("Unknown task type: " + parts[0]);
+                return switch (parts[1]) {
+                    case "T" -> new ToDoTask(parts[3], parts[2].equals("1"));
+                    case "D" -> new DeadlineTask(parts[3], parts[4], parts[2].equals("1"));
+                    case "E" -> new EventTask(parts[3], parts[4].split("-")[0], parts[4].split("-")[1], parts[2].equals("1"));
+                    default -> throw new IllegalArgumentException("Unknown task type: " + parts[1]);
                 };
             }
         }
@@ -184,7 +220,7 @@ public class Meep {
             }
 
             this.task = task;
-            this.done = false;
+            this.done = isDone;
         }
 
         public String getTask() {
