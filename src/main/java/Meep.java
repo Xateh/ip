@@ -2,6 +2,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -12,16 +15,16 @@ public class Meep {
     private static ArrayList<Task> tasks = new ArrayList<>();
     private static String saveFile = "./data/meep.txt";
 
-    private static void printBorder() { System.out.println("-".repeat(50)); }
-
+    private static DateTimeFormatter inputDtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static DateTimeFormatter outputDtf = DateTimeFormatter.ofPattern("MMM dd yyyy");
     private static void printGreeting() { printBordered("Hello from Meep!\nWhat can I do for you?"); }
 
     private static void printFarewell() { printBordered("Bye. Hope to see you again soon!"); }
 
     private static void printBordered(String message) {
-        printBorder();
+        System.out.println("-".repeat(50));
         System.out.println(message);
-        printBorder();
+        System.out.println("-".repeat(50));
     }
 
     private static void processMessage(String message) {
@@ -56,10 +59,11 @@ public class Meep {
                 appendResponseWithNewLine.apply("list:\n\tList all tasks");
                 appendResponseWithNewLine.apply("help:\n\tShow this help message");
                 appendResponseWithNewLine.apply("todo <todo description>: \n\tAdd a Todo Task to task list");
-                appendResponseWithNewLine.apply("deadline <deadline description> /by <deadline time>: \n\tAdd a Deadline Task to task list");
-                appendResponseWithNewLine.apply("event <event description> /from <start time> /to <end time>: \n\tAdd an Event Task to task list");
+                appendResponseWithNewLine.apply("deadline <deadline description> /by <deadline time>: \n\tAdd a Deadline Task to task list (format: " + inputDtf + ")");
+                appendResponseWithNewLine.apply("event <event description> /from <start time> /to <end time>: \n\tAdd an Event Task to task list (format: " + inputDtf + ")");
                 appendResponseWithNewLine.apply("mark <task number>: \n\tMark a task as done");
                 appendResponseWithNewLine.apply("unmark <task number>: \n\tMark a task as not done");
+                appendResponseWithNewLine.apply("check due <date>: \n\tCheck for tasks that are due before the specified date (format: " + inputDtf + ")");
                 appendResponse.apply("delete <task number>: \n\tDelete a task from the list");
             }
             default -> {
@@ -133,6 +137,26 @@ public class Meep {
                     } catch (IOException e) {
                         appendResponse.apply("Error loading tasks: " + e.getMessage());
                     }
+                } else if (message.startsWith("check due")) {
+                    String time = message.substring(9).trim();
+                    String processedTime = Task.printTime(time);
+                    try {
+                        LocalDate.parse(time, inputDtf);
+                    } catch (DateTimeParseException e) {
+                        appendResponse.apply("Invalid date format. Please use yyyy-MM-dd.");
+                        break;
+                    }
+                    appendResponse.apply("Checking for due tasks on " + processedTime + "...");
+
+                    for (Task task : tasks) {
+                        try {
+                            if (task.isDue(time)) {
+                                appendResponseWithNewLine.apply(task.toString());
+                            }
+                        } catch (DateTimeParseException e) {
+                            appendResponseWithNewLine.apply("Unable to check due for task: " + task);
+                        }
+                    }
                 } else {
                     appendResponse.apply("Unrecognised command: \"" + message.split(" ")[0] + "\" Parrotting...\n" + message);
                 }
@@ -155,7 +179,7 @@ public class Meep {
         scanner.close();
     }
 
-    private static class Task {
+    private abstract static class Task {
         private String task;
         private boolean done;
 
@@ -239,6 +263,17 @@ public class Meep {
             done = false;
         }
 
+        public abstract boolean isDue(String time);
+
+        private static String printTime(String time) {
+            try {
+                LocalDate ldt = LocalDate.parse(time, inputDtf);
+                return ldt.format(outputDtf);
+            } catch (DateTimeParseException e) {
+                return time;
+            }
+        }
+
         @Override
         public String toString() {
             return (isDone() ? "[X] " : "[ ] ") + getTask();
@@ -251,6 +286,11 @@ public class Meep {
 
             public ToDoTask(String task, boolean isDone) {
                 super(task, isDone);
+            }
+
+            @Override
+            public boolean isDue(String time) {
+                return false;
             }
 
             @Override
@@ -290,10 +330,19 @@ public class Meep {
             public String getDeadline() {
                 return deadline;
             }
+            
+            @Override
+            public boolean isDue(String time) {
+                try {
+                    return !isDone() && LocalDate.parse(time, inputDtf).isAfter(LocalDate.parse(getDeadline(), inputDtf));
+                } catch (Exception e) {
+                    return false;
+                }
+            }
 
             @Override
             public String toString() {
-                return "[D]" + super.toString() + " (by: " + getDeadline() + ")";
+                return "[D]" + super.toString() + " (by: " + printTime(getDeadline()) + ")";
             }
         }
 
@@ -350,8 +399,17 @@ public class Meep {
             }
 
             @Override
+            public boolean isDue(String time) {
+                try {
+                    return !isDone() && LocalDate.parse(time, inputDtf).isAfter(LocalDate.parse(getEventEndTime(), inputDtf));
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+
+            @Override
             public String toString() {
-                return "[E]" + super.toString() + " (from: " + getEventStartTime() + " to: " + getEventEndTime() + ")";
+                return "[E]" + super.toString() + " (from: " + printTime(getEventStartTime()) + " to: " + printTime(getEventEndTime()) + ")";
             }
         }
     }
