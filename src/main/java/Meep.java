@@ -17,14 +17,15 @@ public class Meep {
 
     private static DateTimeFormatter inputDtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static DateTimeFormatter outputDtf = DateTimeFormatter.ofPattern("MMM dd yyyy");
+
     private static void printGreeting() { printBordered("Hello from Meep!\nWhat can I do for you?"); }
 
     private static void printFarewell() { printBordered("Bye. Hope to see you again soon!"); }
 
     private static void printBordered(String message) {
-        System.out.println("-".repeat(50));
-        System.out.println(message);
-        System.out.println("-".repeat(50));
+        Ui.printResponse("-".repeat(50));
+        Ui.printResponse(message);
+        Ui.printResponse("-".repeat(50));
     }
 
     private static void processMessage(String message) {
@@ -168,15 +169,13 @@ public class Meep {
     public static void main(String[] args) {
         printGreeting();
 
-        Scanner scanner = new Scanner(System.in);
         String message = "";
-        message = scanner.nextLine();
+        message = Ui.readCommand();
         while (!message.equals("bye")) {
             processMessage(message);
-            message = scanner.nextLine();
+            message = Ui.readCommand();
         }
         printFarewell();
-        scanner.close();
     }
 
     private abstract static class Task {
@@ -414,5 +413,19 @@ public class Meep {
         }
     }
 
+    private static class Ui {
+        static Scanner scanner = new Scanner(System.in);
+
+        public static String readCommand() {
+            String command = scanner.nextLine();
+            return command;
+        }
+
+        public static void printResponse(String response) {
+            System.out.println(response);
+        }
+    }
+
     private record Pair<F, S>(F first, S second) {}
 }
+
