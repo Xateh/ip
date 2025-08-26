@@ -8,166 +8,56 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
-import java.util.function.Function;
 
 public class Meep {
-    private static ArrayList<String> messages = new ArrayList<>();
-    private static ArrayList<Task> tasks = new ArrayList<>();
-    private static String saveFile = "./data/meep.txt";
-
-    private static DateTimeFormatter inputDtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static DateTimeFormatter outputDtf = DateTimeFormatter.ofPattern("MMM dd yyyy");
-
-    private static void printGreeting() { printBordered("Hello from Meep!\nWhat can I do for you?"); }
-
-    private static void printFarewell() { printBordered("Bye. Hope to see you again soon!"); }
-
-    private static void printBordered(String message) {
-        Ui.printResponse("-".repeat(50));
-        Ui.printResponse(message);
-        Ui.printResponse("-".repeat(50));
-    }
-
     private static void processMessage(String message) {
-        messages.add(message);
-        StringBuilder response = new StringBuilder();
-        int num = 0;
-
-        Function<String, StringBuilder> appendResponse = x -> response.append(x);
-        Function<String, StringBuilder> appendResponseWithNewLine = x -> response.append("\n").append(x);
+        Command.addMessage(message);
 
         switch (message) {
-            case "hello" -> appendResponse.apply("Hello there!");
-            case "how are you?" -> appendResponse.apply("I'm just a program, but thanks for asking!");
-            case "list messages" -> {
-                appendResponse.apply("Here are all the messages I've received:");
-                for (String msg : messages) {
-                    appendResponse.apply("\n " + (++num) + ". " + msg);
-                }
-            }
-            case "list" -> {
-                appendResponse.apply("Here are all the tasks:");
-                for (Task task : tasks) {
-                    appendResponse.apply("\n " + (++num) + ". " + task);
-                }
-                appendResponse.apply("\nNow you have " + num + " tasks in the list.");
-            }
-            case "help" -> {
-                appendResponseWithNewLine.apply("Here are the list of commands! [case-sensitive]\n");
-                appendResponseWithNewLine.apply("hello:\n\tGreet the program! be polite :)");
-                appendResponseWithNewLine.apply("how are you?:\n\tAsk the program how it is doing");
-                appendResponseWithNewLine.apply("list messages:\n\tList all messages received");
-                appendResponseWithNewLine.apply("list:\n\tList all tasks");
-                appendResponseWithNewLine.apply("help:\n\tShow this help message");
-                appendResponseWithNewLine.apply("todo <todo description>: \n\tAdd a Todo Task to task list");
-                appendResponseWithNewLine.apply("deadline <deadline description> /by <deadline time>: \n\tAdd a Deadline Task to task list (format: " + inputDtf + ")");
-                appendResponseWithNewLine.apply("event <event description> /from <start time> /to <end time>: \n\tAdd an Event Task to task list (format: " + inputDtf + ")");
-                appendResponseWithNewLine.apply("mark <task number>: \n\tMark a task as done");
-                appendResponseWithNewLine.apply("unmark <task number>: \n\tMark a task as not done");
-                appendResponseWithNewLine.apply("check due <date>: \n\tCheck for tasks that are due before the specified date (format: " + inputDtf + ")");
-                appendResponse.apply("delete <task number>: \n\tDelete a task from the list");
-            }
+            case "hello" -> Command.helloCommand();
+            case "how are you?" -> Command.howAreYouCommand();
+            case "list messages" -> Command.listMessageCommand();
+            case "list" -> Command.listCommand();
+            case "help" -> Command.helpCommand();
             default -> {
                 if (message.startsWith("mark ")) {
-                    String taskNumber = message.substring(5);
                     try {
-                        int index = Integer.parseInt(taskNumber) - 1;
-                        tasks.get(index).markDone();
-                        appendResponse.apply("Task " + taskNumber + " marked as done.\n" + tasks.get(index));
-                    } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                        appendResponse.apply("Invalid task number.");
+                        int taskNumber = Integer.parseInt(message.split(" ")[1]);
+                        Command.markCommand(taskNumber);
+                    } catch (NumberFormatException e) {
+                        Ui.printResponse("Invalid task number.");
                     }
                 } else if (message.startsWith("unmark ")) {
-                    String taskNumber = message.substring(7);
                     try {
-                        int index = Integer.parseInt(taskNumber) - 1;
-                        tasks.get(index).markNotDone();
-                        appendResponse.apply("Task " + taskNumber + " marked as not done.\n" + tasks.get(index));
-                    } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                        appendResponse.apply("Invalid task number.");
+                        int taskNumber = Integer.parseInt(message.split(" ")[1]);
+                        Command.unmarkCommand(taskNumber);
+                    } catch (NumberFormatException e) {
+                        Ui.printResponse("Invalid task number.");
                     }
                 } else if (message.startsWith("delete ")) {
-                    String taskNumber = message.substring(7);
                     try {
-                        int index = Integer.parseInt(taskNumber) - 1;
-                        tasks.remove(index);
-                        appendResponse.apply("Task " + taskNumber + " deleted.");
-                    } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                        appendResponse.apply("Invalid task number.");
+                        int taskNumber = Integer.parseInt(message.split(" ")[1]);
+                        Command.deleteCommand(taskNumber);
+                    } catch (NumberFormatException e) {
+                        Ui.printResponse("Invalid task number.");
                     }
                 } else if (Arrays.asList("todo", "deadline", "event").contains(message.split(" ", 2)[0])) {
-                    Pair<Task, Exception> buildPair = Task.buildTask(message);
-                    if (buildPair.second != null)
-                        appendResponse.apply(buildPair.second.getMessage());
-                    else {
-                        tasks.add(buildPair.first);
-                        appendResponseWithNewLine.apply("Got it. I've added this task:\n" + buildPair.first);
-                        appendResponse.apply("\nNow you have " + tasks.size() + " tasks in the list.");
-                    }
+                    Command.addTask(message);
                 } else if (message.startsWith("save")) {
-                    try {
-                        File file = new File(saveFile);
-                        if (!file.exists()) {
-                            file.createNewFile();
-                        }
-                        try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
-                            for (Task task : tasks) {
-                                writer.println(Task.saveString(task));
-                            }
-                        }
-                        appendResponse.apply("Tasks saved to " + file.getAbsolutePath());
-                    } catch (IOException e) {
-                        appendResponse.apply("Error saving tasks: " + e.getMessage());
-                    }
+                    Command.saveCommand();
                 } else if (message.startsWith("load")) {
-                    try {
-                        File file = new File(saveFile);
-                        if (!file.exists()) {
-                            appendResponse.apply("No saved tasks found.");
-                        } else {
-                            tasks.clear();
-                            try (Scanner fileScanner = new Scanner(file)) {
-                                while (fileScanner.hasNextLine()) {
-                                    String line = fileScanner.nextLine();
-                                    Task task = Task.load(line);
-                                    tasks.add(task);
-                                }
-                            }
-                            appendResponse.apply("Tasks loaded from " + file.getAbsolutePath());
-                        }
-                    } catch (IOException e) {
-                        appendResponse.apply("Error loading tasks: " + e.getMessage());
-                    }
+                    Command.loadCommand();
                 } else if (message.startsWith("check due")) {
-                    String time = message.substring(9).trim();
-                    String processedTime = Task.printTime(time);
-                    try {
-                        LocalDate.parse(time, inputDtf);
-                    } catch (DateTimeParseException e) {
-                        appendResponse.apply("Invalid date format. Please use yyyy-MM-dd.");
-                        break;
-                    }
-                    appendResponse.apply("Checking for due tasks on " + processedTime + "...");
-
-                    for (Task task : tasks) {
-                        try {
-                            if (task.isDue(time)) {
-                                appendResponseWithNewLine.apply(task.toString());
-                            }
-                        } catch (DateTimeParseException e) {
-                            appendResponseWithNewLine.apply("Unable to check due for task: " + task);
-                        }
-                    }
+                    Command.checkDueCommand(message);
                 } else {
-                    appendResponse.apply("Unrecognised command: \"" + message.split(" ")[0] + "\" Parrotting...\n" + message);
+                    Command.unknownCommand(message);
                 }
             }
         }
-        printBordered(response.toString());
     }
 
     public static void main(String[] args) {
-        printGreeting();
+        Ui.printResponse("Hello from Meep!\nWhat can I do for you?");
 
         String message = "";
         message = Ui.readCommand();
@@ -175,10 +65,15 @@ public class Meep {
             processMessage(message);
             message = Ui.readCommand();
         }
-        printFarewell();
+        Ui.printResponse("Bye. Hope to see you again soon!");
     }
 
     private abstract static class Task {
+        private static String inputDtfPattern = "yyyy-MM-dd";
+        private static String outputDtfPattern = "MMM dd yyyy";
+        private static DateTimeFormatter inputDtf = DateTimeFormatter.ofPattern(inputDtfPattern);
+        private static DateTimeFormatter outputDtf = DateTimeFormatter.ofPattern(outputDtfPattern);
+
         private String task;
         private boolean done;
 
@@ -260,6 +155,23 @@ public class Meep {
 
         public void markNotDone() {
             done = false;
+        }
+
+        public static boolean checkTimeValid(String time) {
+            try {
+                LocalDate.parse(time, Task.inputDtf);
+                return true;
+            } catch (DateTimeParseException e) {
+                return false;
+            }
+        }
+
+        public static String getInputDtfPattern() {
+            return inputDtfPattern;
+        }
+
+        public static String getOutputDtfPattern() {
+            return outputDtfPattern;
         }
 
         public abstract boolean isDue(String time);
@@ -422,7 +334,207 @@ public class Meep {
         }
 
         public static void printResponse(String response) {
+            System.out.println("-".repeat(50));
             System.out.println(response);
+            System.out.println("-".repeat(50));
+        }
+    }
+
+    private static class Command {
+        private static ArrayList<String> messages = new ArrayList<>();
+        private static ArrayList<Task> tasks = new ArrayList<>();
+        private static String saveFile = "./data/meep.txt";
+
+        public static boolean addMessage(String message) {
+            messages.add(message);
+            return true;
+        }
+
+        public static boolean helloCommand() {
+            Ui.printResponse("Hello there!");
+            return true;
+        }
+
+        public static boolean howAreYouCommand() {
+            Ui.printResponse("I'm just a program, but thanks for asking!");
+            return true;
+        }
+
+        public static boolean listMessageCommand() {
+            StringBuilder response = new StringBuilder();
+            int num = 0;
+
+            response.append("Here are all the messages I've received:");
+            for (String msg : messages) {
+                response.append("\n " + (++num) + ". " + msg);
+            }
+            Ui.printResponse(response.toString());
+            return true;
+        }
+
+        public static boolean listCommand() {
+            StringBuilder response = new StringBuilder();
+            int num = 0;
+
+            response.append("Here are all the tasks:");
+            for (Task task : tasks) {
+                response.append("\n " + (++num) + ". " + task);
+            }
+            response.append("\nNow you have " + num + " tasks in the list.");
+            Ui.printResponse(response.toString());
+            return true;
+        }
+
+        public static boolean markCommand(int taskNumber) {
+            StringBuilder response = new StringBuilder();
+            try {
+                int index = taskNumber - 1;
+                tasks.get(index).markDone();
+                response.append("Task " + taskNumber + " marked as done.\n" + tasks.get(index));
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                response.append("Invalid task number.");
+                return false;
+            }
+            Ui.printResponse(response.toString());
+            return true;
+        }
+
+        public static boolean unmarkCommand(int taskNumber) {
+            StringBuilder response = new StringBuilder();
+            try {
+                int index = taskNumber - 1;
+                tasks.get(index).markNotDone();
+                response.append("Task " + taskNumber + " marked as not done.\n" + tasks.get(index));
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                response.append("Invalid task number.");
+                return false;
+            }
+            Ui.printResponse(response.toString());
+            return true;
+        }
+
+        public static boolean deleteCommand(int taskNumber) {
+            StringBuilder response = new StringBuilder();
+            try {
+                int index = taskNumber - 1;
+                tasks.remove(index);
+                response.append("Task " + taskNumber + " deleted.");
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                response.append("Invalid task number.");
+                return false;
+            }
+            Ui.printResponse(response.toString());
+            return true;
+        }
+
+        public static boolean addTask(String message) {
+            StringBuilder response = new StringBuilder();
+            
+            Pair<Task, Exception> buildPair = Task.buildTask(message);
+            if (buildPair.second != null)
+                response.append(buildPair.second.getMessage());
+            else {
+                tasks.add(buildPair.first);
+                response.append("Got it. I've added this task:\n" + buildPair.first);
+                response.append("\nNow you have " + tasks.size() + " tasks in the list.");
+            }
+            Ui.printResponse(response.toString());
+            return true;
+        }
+
+        public static boolean saveCommand() {
+            StringBuilder response = new StringBuilder();
+            try {
+                File file = new File(saveFile);
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
+                    for (Task task : tasks) {
+                        writer.println(Task.saveString(task));
+                    }
+                }
+                response.append("Tasks saved to " + file.getAbsolutePath());
+            } catch (IOException e) {
+                response.append("Error saving tasks: " + e.getMessage());
+                return false;
+            }
+            Ui.printResponse(response.toString());
+            return true;
+        }
+
+        public static boolean loadCommand() {
+            StringBuilder response = new StringBuilder();
+            try {
+                File file = new File(saveFile);
+                if (!file.exists()) {
+                    response.append("No saved tasks found.");
+                } else {
+                    tasks.clear();
+                    try (Scanner fileScanner = new Scanner(file)) {
+                        while (fileScanner.hasNextLine()) {
+                            String line = fileScanner.nextLine();
+                            Task task = Task.load(line);
+                            tasks.add(task);
+                        }
+                    }
+                    response.append("Tasks loaded from " + file.getAbsolutePath());
+                }
+            } catch (IOException e) {
+                response.append("Error loading tasks: " + e.getMessage());
+                return false;
+            }
+            Ui.printResponse(response.toString());
+            return true;
+        }
+
+        public static boolean checkDueCommand(String message) {
+            StringBuilder response = new StringBuilder();
+            String time = message.substring(9).trim();
+            String processedTime = Task.printTime(time);
+            boolean flag = true;
+
+            if (!Task.checkTimeValid(time)) {
+                response.append("Invalid date format. Please use: " + Task.inputDtf);
+                Ui.printResponse(response.toString());
+                return false;
+            }
+            response.append("Checking for due tasks on " + processedTime + "...");
+
+            for (Task task : tasks) {
+                try {
+                    if (task.isDue(time)) {
+                        response.append("\n").append(task.toString());
+                    }
+                } catch (DateTimeParseException e) {
+                    response.append("\nUnable to check due for task: " + task);
+                    flag = false;
+                }
+            }
+            Ui.printResponse(response.toString());
+            return flag;
+        }
+
+        public static void helpCommand() {
+            StringBuilder response = new StringBuilder();
+            response.append("Here are the list of commands! [case-sensitive]\n");
+            response.append("\nhello:\n\tGreet the program! be polite :)");
+            response.append("\nhow are you?:\n\tAsk the program how it is doing");
+            response.append("\nlist messages:\n\tList all messages received");
+            response.append("\nlist:\n\tList all tasks");
+            response.append("\nhelp:\n\tShow this help message");
+            response.append("\ntodo <todo description>: \n\tAdd a Todo Task to task list");
+            response.append("\ndeadline <deadline description> /by <deadline time>: \n\tAdd a Deadline Task to task list (format: " + Task.getInputDtfPattern() + ")");
+            response.append("\nevent <event description> /from <start time> /to <end time>: \n\tAdd an Event Task to task list (format: " + Task.getInputDtfPattern() + ")");
+            response.append("\nmark <task number>: \n\tMark a task as done");
+            response.append("\nunmark <task number>: \n\tMark a task as not done");
+            response.append("\ncheck due <date>: \n\tCheck for tasks that are due before the specified date (format: " + Task.getInputDtfPattern() + ")");
+
+            Ui.printResponse(response.toString());
+        }
+
+        public static void unknownCommand(String command) {
+            Ui.printResponse("Unrecognised command: \"" + command.split(" ")[0] + "\" Parrotting...\n" + command);
         }
     }
 
