@@ -3,6 +3,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -342,7 +343,7 @@ public class Meep {
 
     private static class Command {
         private static ArrayList<String> messages = new ArrayList<>();
-        private static ArrayList<Task> tasks = new ArrayList<>();
+        private static TaskList tasklist = new TaskList();
         private static String saveFile = "./data/meep.txt";
 
         public static boolean addMessage(String message) {
@@ -374,13 +375,10 @@ public class Meep {
 
         public static boolean listCommand() {
             StringBuilder response = new StringBuilder();
-            int num = 0;
 
             response.append("Here are all the tasks:");
-            for (Task task : tasks) {
-                response.append("\n " + (++num) + ". " + task);
-            }
-            response.append("\nNow you have " + num + " tasks in the list.");
+            tasklist.iterateTasks((task, index) -> response.append("\n " + (index + 1) + ". " + task));
+            response.append("\nNow you have " + tasklist.size() + " tasks in the list.");
             Ui.printResponse(response.toString());
             return true;
         }
@@ -389,8 +387,8 @@ public class Meep {
             StringBuilder response = new StringBuilder();
             try {
                 int index = taskNumber - 1;
-                tasks.get(index).markDone();
-                response.append("Task " + taskNumber + " marked as done.\n" + tasks.get(index));
+                tasklist.get(index).markDone();
+                response.append("Task " + taskNumber + " marked as done.\n" + tasklist.get(index));
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
                 response.append("Invalid task number.");
                 return false;
@@ -403,8 +401,8 @@ public class Meep {
             StringBuilder response = new StringBuilder();
             try {
                 int index = taskNumber - 1;
-                tasks.get(index).markNotDone();
-                response.append("Task " + taskNumber + " marked as not done.\n" + tasks.get(index));
+                tasklist.get(index).markNotDone();
+                response.append("Task " + taskNumber + " marked as not done.\n" + tasklist.get(index));
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
                 response.append("Invalid task number.");
                 return false;
@@ -417,7 +415,7 @@ public class Meep {
             StringBuilder response = new StringBuilder();
             try {
                 int index = taskNumber - 1;
-                tasks.remove(index);
+                tasklist.removeTask(index);
                 response.append("Task " + taskNumber + " deleted.");
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
                 response.append("Invalid task number.");
@@ -434,9 +432,9 @@ public class Meep {
             if (buildPair.second != null)
                 response.append(buildPair.second.getMessage());
             else {
-                tasks.add(buildPair.first);
+                tasklist.addTask(buildPair.first);
                 response.append("Got it. I've added this task:\n" + buildPair.first);
-                response.append("\nNow you have " + tasks.size() + " tasks in the list.");
+                response.append("\nNow you have " + tasklist.size() + " tasks in the list.");
             }
             Ui.printResponse(response.toString());
             return true;
@@ -450,9 +448,7 @@ public class Meep {
                     file.createNewFile();
                 }
                 try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
-                    for (Task task : tasks) {
-                        writer.println(Task.saveString(task));
-                    }
+                    tasklist.iterateTasks(task -> writer.println(Task.saveString(task)));
                 }
                 response.append("Tasks saved to " + file.getAbsolutePath());
             } catch (IOException e) {
@@ -470,12 +466,12 @@ public class Meep {
                 if (!file.exists()) {
                     response.append("No saved tasks found.");
                 } else {
-                    tasks.clear();
+                    tasklist.clearTasks();
                     try (Scanner fileScanner = new Scanner(file)) {
                         while (fileScanner.hasNextLine()) {
                             String line = fileScanner.nextLine();
                             Task task = Task.load(line);
-                            tasks.add(task);
+                            tasklist.addTask(task);
                         }
                     }
                     response.append("Tasks loaded from " + file.getAbsolutePath());
@@ -492,7 +488,6 @@ public class Meep {
             StringBuilder response = new StringBuilder();
             String time = message.substring(9).trim();
             String processedTime = Task.printTime(time);
-            boolean flag = true;
 
             if (!Task.checkTimeValid(time)) {
                 response.append("Invalid date format. Please use: " + Task.inputDtf);
@@ -501,18 +496,20 @@ public class Meep {
             }
             response.append("Checking for due tasks on " + processedTime + "...");
 
-            for (Task task : tasks) {
+            ArrayList<Boolean> flags = new ArrayList<>();
+            tasklist.iterateTasks(task -> {
                 try {
                     if (task.isDue(time)) {
                         response.append("\n").append(task.toString());
                     }
                 } catch (DateTimeParseException e) {
                     response.append("\nUnable to check due for task: " + task);
-                    flag = false;
+                    flags.add(false);
                 }
-            }
+            });
+
             Ui.printResponse(response.toString());
-            return flag;
+            return flags.stream().allMatch(flag -> flag);
         }
 
         public static void helpCommand() {
@@ -535,6 +532,119 @@ public class Meep {
 
         public static void unknownCommand(String command) {
             Ui.printResponse("Unrecognised command: \"" + command.split(" ")[0] + "\" Parrotting...\n" + command);
+        }
+    }
+
+    private static class TaskList {
+        private final ArrayList<Task> tasks;
+
+        public TaskList() {
+            this.tasks = new ArrayList<>();
+        }
+
+        public void addTask(Task task) {
+            tasks.add(task);
+        }
+
+        public void removeTask(int index) {
+            tasks.remove(index);
+        }
+
+        public void clearTasks() {
+            tasks.clear();
+        }
+
+        public Task get(int index) {
+            return tasks.get(index);
+        }
+
+        public int size() {
+            return tasks.size();
+        }
+
+        public void iterateTasks(TaskAction action) {
+            for (Task task : tasks) {
+                action.apply(task);
+            }
+        }
+
+        public void iterateTasks(IndexTaskAction action) {
+            for (int i = 0; i < tasks.size(); i++) {
+                action.apply(tasks.get(i), i);
+            }
+        }
+
+        @FunctionalInterface
+        private interface TaskAction {
+            void apply(Task task);
+        }
+
+        @FunctionalInterface
+        private interface IndexTaskAction {
+            void apply(Task task, int index);
+        }
+    }
+
+    private static class MessageList {
+        private static ArrayList<Message> messages = new ArrayList<>();
+
+        public static String addMessage(String message) {
+            return addMessage(new Message(message));
+        }
+
+        public static String addMessage(Message message) {
+            messages.add(message);
+            return message.toString();
+        }
+
+        public static Message removeMessage(int index) {
+            return messages.remove(index);
+        }
+
+        public static boolean clearMessages() {
+            messages.clear();
+            return true;
+        }
+
+        public static int size() {
+            return messages.size();
+        }
+
+        public void iterateTasks(MessageAction action) {
+            for (Message message : messages) {
+                action.apply(message);
+            }
+        }
+
+        public void iterateTasks(IndexMessageAction action) {
+            for (int i = 0; i < messages.size(); i++) {
+                action.apply(messages.get(i), i);
+            }
+        }
+
+        @FunctionalInterface
+        private interface MessageAction {
+            void apply(Message message);
+        }
+
+        @FunctionalInterface
+        private interface IndexMessageAction {
+            void apply(Message message, int index);
+        }
+
+        private static class Message {
+            private static String message;
+            private static LocalDateTime time;
+
+            public Message(String message) {
+                this.message = message;
+                this.time = LocalDateTime.now();
+            }
+
+            @Override
+            public String toString() {
+                return "[" + time + "] " + message;
+            }
         }
     }
 
