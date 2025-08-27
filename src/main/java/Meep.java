@@ -11,59 +11,13 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Meep {
-    private static void processMessage(String message) {
-        Command.addMessage(message);
-
-        switch (message) {
-            case "hello" -> Command.helloCommand();
-            case "how are you?" -> Command.howAreYouCommand();
-            case "list messages" -> Command.listMessageCommand();
-            case "list" -> Command.listCommand();
-            case "help" -> Command.helpCommand();
-            default -> {
-                if (message.startsWith("mark ")) {
-                    try {
-                        int taskNumber = Integer.parseInt(message.split(" ")[1]);
-                        Command.markCommand(taskNumber);
-                    } catch (NumberFormatException e) {
-                        Ui.printResponse("Invalid task number.");
-                    }
-                } else if (message.startsWith("unmark ")) {
-                    try {
-                        int taskNumber = Integer.parseInt(message.split(" ")[1]);
-                        Command.unmarkCommand(taskNumber);
-                    } catch (NumberFormatException e) {
-                        Ui.printResponse("Invalid task number.");
-                    }
-                } else if (message.startsWith("delete ")) {
-                    try {
-                        int taskNumber = Integer.parseInt(message.split(" ")[1]);
-                        Command.deleteCommand(taskNumber);
-                    } catch (NumberFormatException e) {
-                        Ui.printResponse("Invalid task number.");
-                    }
-                } else if (Arrays.asList("todo", "deadline", "event").contains(message.split(" ", 2)[0])) {
-                    Command.addTask(message);
-                } else if (message.startsWith("save")) {
-                    Command.saveCommand();
-                } else if (message.startsWith("load")) {
-                    Command.loadCommand();
-                } else if (message.startsWith("check due")) {
-                    Command.checkDueCommand(message);
-                } else {
-                    Command.unknownCommand(message);
-                }
-            }
-        }
-    }
-
     public static void main(String[] args) {
         Ui.printResponse("Hello from Meep!\nWhat can I do for you?");
 
         String message = "";
         message = Ui.readCommand();
         while (!message.equals("bye")) {
-            processMessage(message);
+            Parser.parse(message);
             message = Ui.readCommand();
         }
         Ui.printResponse("Bye. Hope to see you again soon!");
@@ -341,13 +295,61 @@ public class Meep {
         }
     }
 
+    private static class Parser {
+        private static void parse(String message) {
+            Command.addMessage(message);
+
+            switch (message) {
+                case "hello" -> Command.helloCommand();
+                case "how are you?" -> Command.howAreYouCommand();
+                case "list messages" -> Command.listMessageCommand();
+                case "list" -> Command.listCommand();
+                case "help" -> Command.helpCommand();
+                default -> {
+                    if (message.startsWith("mark ")) {
+                        try {
+                            int taskNumber = Integer.parseInt(message.split(" ")[1]);
+                            Command.markCommand(taskNumber);
+                        } catch (NumberFormatException e) {
+                            Ui.printResponse("Invalid task number.");
+                        }
+                    } else if (message.startsWith("unmark ")) {
+                        try {
+                            int taskNumber = Integer.parseInt(message.split(" ")[1]);
+                            Command.unmarkCommand(taskNumber);
+                        } catch (NumberFormatException e) {
+                            Ui.printResponse("Invalid task number.");
+                        }
+                    } else if (message.startsWith("delete ")) {
+                        try {
+                            int taskNumber = Integer.parseInt(message.split(" ")[1]);
+                            Command.deleteCommand(taskNumber);
+                        } catch (NumberFormatException e) {
+                            Ui.printResponse("Invalid task number.");
+                        }
+                    } else if (Arrays.asList("todo", "deadline", "event").contains(message.split(" ", 2)[0])) {
+                        Command.addTask(message);
+                    } else if (message.startsWith("save")) {
+                        Command.saveCommand();
+                    } else if (message.startsWith("load")) {
+                        Command.loadCommand();
+                    } else if (message.startsWith("check due")) {
+                        Command.checkDueCommand(message);
+                    } else {
+                        Command.unknownCommand(message);
+                    }
+                }
+            }
+        }
+    }
+
     private static class Command {
-        private static ArrayList<String> messages = new ArrayList<>();
+        private static MessageList messages = new MessageList();
         private static TaskList tasklist = new TaskList();
         private static String saveFile = "./data/meep.txt";
 
         public static boolean addMessage(String message) {
-            messages.add(message);
+            messages.addMessage(message);
             return true;
         }
 
@@ -363,12 +365,10 @@ public class Meep {
 
         public static boolean listMessageCommand() {
             StringBuilder response = new StringBuilder();
-            int num = 0;
 
             response.append("Here are all the messages I've received:");
-            for (String msg : messages) {
-                response.append("\n " + (++num) + ". " + msg);
-            }
+            messages.iterateMessages((msg, idx) -> response.append("\n " + (idx + 1) + ". " + msg));
+
             Ui.printResponse(response.toString());
             return true;
         }
@@ -586,37 +586,37 @@ public class Meep {
     }
 
     private static class MessageList {
-        private static ArrayList<Message> messages = new ArrayList<>();
+        private ArrayList<Message> messages = new ArrayList<>();
 
-        public static String addMessage(String message) {
+        public String addMessage(String message) {
             return addMessage(new Message(message));
         }
 
-        public static String addMessage(Message message) {
+        public String addMessage(Message message) {
             messages.add(message);
             return message.toString();
         }
 
-        public static Message removeMessage(int index) {
+        public Message removeMessage(int index) {
             return messages.remove(index);
         }
 
-        public static boolean clearMessages() {
+        public boolean clearMessages() {
             messages.clear();
             return true;
         }
 
-        public static int size() {
+        public int size() {
             return messages.size();
         }
 
-        public void iterateTasks(MessageAction action) {
+        public void iterateMessages(MessageAction action) {
             for (Message message : messages) {
                 action.apply(message);
             }
         }
 
-        public void iterateTasks(IndexMessageAction action) {
+        public void iterateMessages(IndexMessageAction action) {
             for (int i = 0; i < messages.size(); i++) {
                 action.apply(messages.get(i), i);
             }
@@ -633,8 +633,8 @@ public class Meep {
         }
 
         private static class Message {
-            private static String message;
-            private static LocalDateTime time;
+            private String message;
+            private LocalDateTime time;
 
             public Message(String message) {
                 this.message = message;
@@ -643,7 +643,7 @@ public class Meep {
 
             @Override
             public String toString() {
-                return "[" + time + "] " + message;
+                return "[" + time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "] " + message;
             }
         }
     }
