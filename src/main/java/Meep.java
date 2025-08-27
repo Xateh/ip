@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Meep {
@@ -346,7 +347,6 @@ public class Meep {
     private static class Command {
         private static MessageList messages = new MessageList();
         private static TaskList tasklist = new TaskList();
-        private static String saveFile = "./data/meep.txt";
 
         public static boolean addMessage(String message) {
             messages.addMessage(message);
@@ -442,46 +442,26 @@ public class Meep {
 
         public static boolean saveCommand() {
             StringBuilder response = new StringBuilder();
-            try {
-                File file = new File(saveFile);
-                if (!file.exists()) {
-                    file.createNewFile();
-                }
-                try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
-                    tasklist.iterateTasks(task -> writer.println(Task.saveString(task)));
-                }
-                response.append("Tasks saved to " + file.getAbsolutePath());
-            } catch (IOException e) {
-                response.append("Error saving tasks: " + e.getMessage());
-                return false;
+            boolean flag = Storage.saveTasks(tasklist, response);
+            if (flag) {
+                response.append("Tasks saved successfully.");
+            } else {
+                response.append("Error saving tasks.");
             }
             Ui.printResponse(response.toString());
-            return true;
+            return flag;
         }
 
         public static boolean loadCommand() {
             StringBuilder response = new StringBuilder();
-            try {
-                File file = new File(saveFile);
-                if (!file.exists()) {
-                    response.append("No saved tasks found.");
-                } else {
-                    tasklist.clearTasks();
-                    try (Scanner fileScanner = new Scanner(file)) {
-                        while (fileScanner.hasNextLine()) {
-                            String line = fileScanner.nextLine();
-                            Task task = Task.load(line);
-                            tasklist.addTask(task);
-                        }
-                    }
-                    response.append("Tasks loaded from " + file.getAbsolutePath());
-                }
-            } catch (IOException e) {
-                response.append("Error loading tasks: " + e.getMessage());
-                return false;
+            boolean flag = Storage.loadTasks(tasklist, response);
+            if (flag) {
+                response.append("Tasks loaded successfully.");
+            } else {
+                response.append("Error loading tasks.");
             }
             Ui.printResponse(response.toString());
-            return true;
+            return flag;
         }
 
         public static boolean checkDueCommand(String message) {
@@ -532,6 +512,49 @@ public class Meep {
 
         public static void unknownCommand(String command) {
             Ui.printResponse("Unrecognised command: \"" + command.split(" ")[0] + "\" Parrotting...\n" + command);
+        }
+    }
+
+    private static class Storage {
+        private static String FILE_PATH = "data/meep.txt";
+
+        public static boolean saveTasks(TaskList tasklist, StringBuilder response) {
+            try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH))) {
+                tasklist.iterateTasks(task -> writer.println(Task.saveString(task)));
+                return true;
+            } catch (IOException e) {
+                response.append("Error saving tasks.");
+                return false;
+            }
+        }
+
+        public static boolean loadTasks(TaskList tasklist, StringBuilder response) {
+            File file = new File(FILE_PATH);
+            if (!file.exists()) {
+                return false;
+            }
+
+            boolean flag = true;
+            try (Scanner fileScanner = new Scanner(file)) {
+                
+                while (fileScanner.hasNextLine()) {
+                    try {
+                        String line = fileScanner.nextLine();
+                        Task task = Task.load(line);
+                        tasklist.addTask(task);
+                    } catch (NoSuchElementException | IllegalStateException e) {
+                        flag = false;
+                    }
+                }
+            } catch (IOException e) {
+                response.append(FILE_PATH).append(" not found");
+                flag = false;
+            }
+            return flag;
+        }
+
+        public static void setSaveFile(String path) {
+            FILE_PATH = path;
         }
     }
 
