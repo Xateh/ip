@@ -1,6 +1,9 @@
 package meep.tool;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
@@ -29,7 +32,8 @@ class TaskListTest {
 
         AtomicInteger sumIdx = new AtomicInteger();
         list.iterateTasks((task, idx) -> {
-            if (idx == 0) assertTrue(task.toString().contains("t2"));
+            if (idx == 0)
+                assertTrue(task.toString().contains("t2"));
             sumIdx.addAndGet(idx + 1);
         });
         assertEquals(1, sumIdx.get());

@@ -1,6 +1,9 @@
 package meep.tool;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
@@ -36,8 +39,10 @@ class MessageListTest {
 
         AtomicInteger indexed = new AtomicInteger();
         list.iterateMessages((m, idx) -> {
-            if (idx == 0) assertTrue(m.toString().endsWith(" a"));
-            if (idx == 1) assertTrue(m.toString().endsWith(" b"));
+            if (idx == 0)
+                assertTrue(m.toString().endsWith(" a"));
+            if (idx == 1)
+                assertTrue(m.toString().endsWith(" b"));
             indexed.addAndGet(idx + 1);
         });
         assertEquals(3, indexed.get());

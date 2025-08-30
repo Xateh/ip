@@ -1,6 +1,8 @@
 package meep.tool;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -27,9 +29,9 @@ class CommandTest {
     void helloAndHowAreYouPrint() {
         assertTrue(Command.helloCommand());
         assertTrue(Command.howAreYouCommand());
-    String s = out.toString();
-    assertTrue(s.contains("Hello there!"));
-    assertTrue(s.contains("I'm just a program, but thanks for asking!"));
+        String s = out.toString();
+        assertTrue(s.contains("Hello there!"));
+        assertTrue(s.contains("I'm just a program, but thanks for asking!"));
     }
 
     @Test
@@ -39,35 +41,35 @@ class CommandTest {
         assertTrue(Command.markCommand(1));
         assertTrue(Command.unmarkCommand(1));
         assertTrue(Command.deleteCommand(1));
-    String s = out.toString();
-    assertTrue(s.contains("Got it. I've added this task:"));
-    assertTrue(s.contains("Here are all the tasks:"));
-    assertTrue(s.contains("Task 1 marked as done."));
-    assertTrue(s.contains("Task 1 marked as not done."));
-    assertTrue(s.contains("Task 1 deleted."));
+        String s = out.toString();
+        assertTrue(s.contains("Got it. I've added this task:"));
+        assertTrue(s.contains("Here are all the tasks:"));
+        assertTrue(s.contains("Task 1 marked as done."));
+        assertTrue(s.contains("Task 1 marked as not done."));
+        assertTrue(s.contains("Task 1 deleted."));
     }
 
     @Test
     void helpAndUnknown() {
         Command.helpCommand();
         Command.unknownCommand("noop");
-    String s = out.toString();
-    assertTrue(s.contains("Here are the list of commands! [case-sensitive]"));
-    assertTrue(s.contains("Unrecognised command: \"noop\""));
+        String s = out.toString();
+        assertTrue(s.contains("Here are the list of commands! [case-sensitive]"));
+        assertTrue(s.contains("Unrecognised command: \"noop\""));
     }
 
     @Test
     void invalidIndicesReturnFalseAndPrintMessage() {
         out.reset();
-    assertFalse(Command.markCommand(0));
-    // Command returns false early without printing on invalid indices
-    assertEquals("", out.toString());
+        assertFalse(Command.markCommand(0));
+        // Command returns false early without printing on invalid indices
+        assertEquals("", out.toString());
         out.reset();
-    assertFalse(Command.unmarkCommand(-1));
-    assertEquals("", out.toString());
+        assertFalse(Command.unmarkCommand(-1));
+        assertEquals("", out.toString());
         out.reset();
-    assertFalse(Command.deleteCommand(9999));
-    assertEquals("", out.toString());
+        assertFalse(Command.deleteCommand(9999));
+        assertEquals("", out.toString());
     }
 
     @Test
@@ -94,7 +96,7 @@ class CommandTest {
 
         // Only those strictly before should be due (since isDue uses isAfter)
         out.reset();
-    assertTrue(Command.checkDueCommand("check due 2025-12-31"));
+        assertTrue(Command.checkDueCommand("check due 2025-12-31"));
         String s = out.toString();
         assertTrue(s.contains("DUE_BEFORE"));
         assertFalse(s.contains("DUE_EQUAL"));
@@ -102,7 +104,7 @@ class CommandTest {
         assertTrue(s.contains("E_BEFORE"));
         assertFalse(s.contains("E_EQUAL"));
         assertFalse(s.contains("E_AFTER"));
-    assertTrue(s.contains("Checking for due tasks on "));
+        assertTrue(s.contains("Checking for due tasks on "));
     }
 
     @Test

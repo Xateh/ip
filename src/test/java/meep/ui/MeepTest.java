@@ -1,6 +1,6 @@
 package meep.ui;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,9 +31,9 @@ class MeepTest {
     @Test
     void mainPrintsGreetingAndBye() {
         System.setIn(new ByteArrayInputStream("help\nbye\n".getBytes()));
-    // Reinitialize Ui.scanner to point to the new System.in
-    Ui.scanner = new Scanner(System.in);
-        Meep.main(new String[]{});
+        // Reinitialize Ui.scanner to point to the new System.in
+        Ui.scanner = new Scanner(System.in);
+        Meep.main(new String[] {});
         String s = out.toString();
         assertTrue(s.contains("Hello from Meep"));
         assertTrue(s.contains("Bye. Hope to see you again soon!"));
@@ -43,7 +43,7 @@ class MeepTest {
     void byeMustMatchExactly() {
         System.setIn(new ByteArrayInputStream("bye \nbye\n".getBytes()));
         Ui.scanner = new Scanner(System.in);
-        Meep.main(new String[]{});
+        Meep.main(new String[] {});
         String s = out.toString();
         // First 'bye ' won't exit; second exact 'bye' exits
         assertTrue(s.contains("Hello from Meep"));
@@ -53,19 +53,19 @@ class MeepTest {
     @Test
     void longSessionDoesNotCrash() {
         String input = String.join("\n",
-            "hello",
-            "todo a",
-            "deadline b /by 2025-01-01",
-            "event c /from 2025-01-01 /to 2025-01-02",
-            "list",
-            "check due 2025-01-02",
-            "save",
-            "load",
-            "bye",
-            "");
+                "hello",
+                "todo a",
+                "deadline b /by 2025-01-01",
+                "event c /from 2025-01-01 /to 2025-01-02",
+                "list",
+                "check due 2025-01-02",
+                "save",
+                "load",
+                "bye",
+                "");
         System.setIn(new ByteArrayInputStream(input.getBytes()));
         Ui.scanner = new Scanner(System.in);
-        Meep.main(new String[]{});
+        Meep.main(new String[] {});
         String s = out.toString();
         assertTrue(s.contains("Hello from Meep"));
         assertTrue(s.contains("Bye. Hope to see you again soon!"));
