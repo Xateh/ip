@@ -133,7 +133,7 @@ class Command {
      */
     public static boolean addTask(String message) {
         StringBuilder response = new StringBuilder();
-        
+
         Pair<Task, Exception> buildPair = Task.buildTask(message);
         if (buildPair.getSecond() != null)
             response.append(buildPair.getSecond().getMessage());
@@ -223,11 +223,16 @@ class Command {
         response.append("\nlist:\n\tList all tasks");
         response.append("\nhelp:\n\tShow this help message");
         response.append("\ntodo <todo description>: \n\tAdd a Todo Task to task list");
-        response.append("\ndeadline <deadline description> /by <deadline time>: \n\tAdd a Deadline Task to task list (format: " + Task.getInputDtfPattern() + ")");
-        response.append("\nevent <event description> /from <start time> /to <end time>: \n\tAdd an Event Task to task list (format: " + Task.getInputDtfPattern() + ")");
+        response.append(
+                "\ndeadline <deadline description> /by <deadline time>: \n\tAdd a Deadline Task to task list (format: "
+                        + Task.getInputDtfPattern() + ")");
+        response.append(
+                "\nevent <event description> /from <start time> /to <end time>: \n\tAdd an Event Task to task list (format: "
+                        + Task.getInputDtfPattern() + ")");
         response.append("\nmark <task number>: \n\tMark a task as done");
         response.append("\nunmark <task number>: \n\tMark a task as not done");
-        response.append("\ncheck due <date>: \n\tCheck for tasks that are due before the specified date (format: " + Task.getInputDtfPattern() + ")");
+        response.append("\ncheck due <date>: \n\tCheck for tasks that are due before the specified date (format: "
+                + Task.getInputDtfPattern() + ")");
 
         Ui.printResponse(response.toString());
     }
@@ -238,5 +243,28 @@ class Command {
      */
     public static void unknownCommand(String command) {
         Ui.printResponse("Unrecognised command: \"" + command.split(" ")[0] + "\" Parrotting...\n" + command);
+    }
+
+    public static void findCommand(String string) {
+        StringBuilder response = new StringBuilder();
+        ArrayList<Task> matches = new ArrayList<>();
+
+        tasklist.iterateTasks(task -> {
+            if (task.checkDescriptionContains(string)) {
+                matches.add(task);
+            }
+        });
+
+        if (matches.isEmpty()) {
+            response.append("No tasks found matching: \"" + string + "\"");
+        } else {
+            response.append("Found the following tasks matching: \"" + string);
+            int num = 0;
+            for (Task task : matches) {
+                response.append("\n" + ++num + ") " + task.toString());
+            }
+        }
+
+        Ui.printResponse(response.toString());
     }
 }
