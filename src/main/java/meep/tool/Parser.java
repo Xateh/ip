@@ -4,7 +4,15 @@ import java.util.Arrays;
 
 import meep.ui.Ui;
 
+/**
+ * Routes raw user input to specific command handlers in {@link Command}.
+ */
 public class Parser {
+    /**
+     * Parses and executes a command from a raw input string.
+     * This method also records the message.
+     * @param message user input
+     */
     public static void parse(String message) {
         Command.addMessage(message);
 
