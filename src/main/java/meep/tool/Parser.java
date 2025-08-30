@@ -1,28 +1,36 @@
 package meep.tool;
 
 import java.util.Arrays;
-
 import meep.ui.Ui;
 
-/**
- * Routes raw user input to specific command handlers in {@link Command}.
- */
+/** Routes raw user input to specific command handlers in {@link Command}. */
 public class Parser {
     /**
-     * Parses and executes a command from a raw input string.
-     * This method also records the message.
+     * Parses and executes a command from a raw input string. This method also
+     * records the message.
+     *
      * @param message user input
      */
     public static void parse(String message) {
         Command.addMessage(message);
 
         switch (message) {
-            case "hello" -> Command.helloCommand();
-            case "how are you?" -> Command.howAreYouCommand();
-            case "list messages" -> Command.listMessageCommand();
-            case "list" -> Command.listCommand();
-            case "help" -> Command.helpCommand();
-            default -> {
+            case "hello":
+                Command.helloCommand();
+                break;
+            case "how are you?":
+                Command.howAreYouCommand();
+                break;
+            case "list messages":
+                Command.listMessageCommand();
+                break;
+            case "list":
+                Command.listCommand();
+                break;
+            case "help":
+                Command.helpCommand();
+                break;
+            default:
                 if (message.startsWith("mark ")) {
                     try {
                         int taskNumber = Integer.parseInt(message.split(" ")[1]);
@@ -57,7 +65,6 @@ public class Parser {
                 } else {
                     Command.unknownCommand(message);
                 }
-            }
         }
     }
 }

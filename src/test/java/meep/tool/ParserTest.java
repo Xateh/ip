@@ -33,12 +33,14 @@ class ParserTest {
         Parser.parse("list messages");
         Parser.parse("list");
         Parser.parse("help");
+        Parser.parse("find abc");
         String s = out.toString();
         assertTrue(s.contains("Hello there!"));
         assertTrue(s.contains("I'm just a program, but thanks for asking!"));
         assertTrue(s.contains("Here are all the messages I've received:"));
         assertTrue(s.contains("Here are all the tasks:"));
         assertTrue(s.contains("Here are the list of commands! [case-sensitive]"));
+        assertTrue(s.contains("No tasks found matching: \"abc\""));
     }
 
     @Test

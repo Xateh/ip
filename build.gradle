@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'com.diffplug.spotless' version '6.25.0'
 }
 
 repositories {
@@ -46,4 +47,20 @@ shadowJar {
 
 run{
     standardInput = System.in
+}
+
+spotless {
+    java {
+        target 'src/**/*.java'
+    importOrder()
+    googleJavaFormat('1.19.2').reflowLongStrings()
+        trimTrailingWhitespace()
+        endWithNewline()
+        indentWithSpaces(4)
+    }
+}
+
+// Enforce formatting on CI via the standard 'check' lifecycle
+tasks.named('check') {
+    dependsOn 'spotlessCheck'
 }

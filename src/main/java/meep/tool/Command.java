@@ -2,12 +2,12 @@ package meep.tool;
 
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-
 import meep.ui.Ui;
 
 /**
- * Central command handler for Meep. Contains static methods that mutate
- * the in-memory message and task lists and print responses via {@link meep.ui.Ui}.
+ * Central command handler for Meep. Contains static methods that mutate the
+ * in-memory message and
+ * task lists and print responses via {@link meep.ui.Ui}.
  */
 class Command {
     private static MessageList messages = new MessageList();
@@ -15,6 +15,7 @@ class Command {
 
     /**
      * Adds a raw input message to the internal message list.
+     *
      * @param message user input
      * @return true if the operation completes
      */
@@ -25,6 +26,7 @@ class Command {
 
     /**
      * Prints a hello response.
+     *
      * @return true always
      */
     public static boolean helloCommand() {
@@ -34,6 +36,7 @@ class Command {
 
     /**
      * Prints a canned "how are you" response.
+     *
      * @return true always
      */
     public static boolean howAreYouCommand() {
@@ -43,6 +46,7 @@ class Command {
 
     /**
      * Prints all stored messages in order with 1-based numbering.
+     *
      * @return true always
      */
     public static boolean listMessageCommand() {
@@ -57,6 +61,7 @@ class Command {
 
     /**
      * Prints all tasks and a summary count.
+     *
      * @return true always
      */
     public static boolean listCommand() {
@@ -71,6 +76,7 @@ class Command {
 
     /**
      * Marks the given task as done.
+     *
      * @param taskNumber 1-based index of the task
      * @return true if marked; false if the index is invalid
      */
@@ -90,6 +96,7 @@ class Command {
 
     /**
      * Marks the given task as not done.
+     *
      * @param taskNumber 1-based index of the task
      * @return true if unmarked; false if the index is invalid
      */
@@ -109,6 +116,7 @@ class Command {
 
     /**
      * Deletes the given task.
+     *
      * @param taskNumber 1-based index of the task
      * @return true if deleted; false if the index is invalid
      */
@@ -127,7 +135,9 @@ class Command {
     }
 
     /**
-     * Parses the message as a task command (todo/deadline/event) and adds it to the list.
+     * Parses the message as a task command (todo/deadline/event) and adds it to the
+     * list.
+     *
      * @param message raw command string
      * @return true always
      */
@@ -148,6 +158,7 @@ class Command {
 
     /**
      * Persists tasks to disk via {@link Storage}.
+     *
      * @return true if save succeeded, false otherwise
      */
     public static boolean saveCommand() {
@@ -164,6 +175,7 @@ class Command {
 
     /**
      * Loads tasks from disk via {@link Storage} into the in-memory list.
+     *
      * @return true if load succeeded, false otherwise
      */
     public static boolean loadCommand() {
@@ -180,6 +192,7 @@ class Command {
 
     /**
      * Checks and lists tasks due strictly before the given date.
+     *
      * @param message full command string starting with "check due "
      * @return true if all checks succeed; false on invalid date or parse errors
      */
@@ -196,24 +209,23 @@ class Command {
         response.append("Checking for due tasks on " + processedTime + "...");
 
         ArrayList<Boolean> flags = new ArrayList<>();
-        tasklist.iterateTasks(task -> {
-            try {
-                if (task.isDue(time)) {
-                    response.append("\n").append(task.toString());
-                }
-            } catch (DateTimeParseException e) {
-                response.append("\nUnable to check due for task: " + task);
-                flags.add(false);
-            }
-        });
+        tasklist.iterateTasks(
+                task -> {
+                    try {
+                        if (task.isDue(time)) {
+                            response.append("\n").append(task.toString());
+                        }
+                    } catch (DateTimeParseException e) {
+                        response.append("\nUnable to check due for task: " + task);
+                        flags.add(false);
+                    }
+                });
 
         Ui.printResponse(response.toString());
         return flags.stream().allMatch(flag -> flag);
     }
 
-    /**
-     * Prints the help text including commands and date formats.
-     */
+    /** Prints the help text including commands and date formats. */
     public static void helpCommand() {
         StringBuilder response = new StringBuilder();
         response.append("Here are the list of commands! [case-sensitive]\n");
@@ -224,36 +236,60 @@ class Command {
         response.append("\nhelp:\n\tShow this help message");
         response.append("\ntodo <todo description>: \n\tAdd a Todo Task to task list");
         response.append(
-                "\ndeadline <deadline description> /by <deadline time>: \n\tAdd a Deadline Task to task list (format: "
-                        + Task.getInputDtfPattern() + ")");
+                "\n"
+                        + "deadline <deadline description> /by <deadline time>: \n"
+                        + "\tAdd a Deadline Task to task list (format: "
+                        + Task.getInputDtfPattern()
+                        + ")");
         response.append(
-                "\nevent <event description> /from <start time> /to <end time>: \n\tAdd an Event Task to task list (format: "
-                        + Task.getInputDtfPattern() + ")");
+                "\n"
+                        + "event <event description> /from <start time> /to <end time>: \n"
+                        + "\tAdd an Event Task to task list (format: "
+                        + Task.getInputDtfPattern()
+                        + ")");
         response.append("\nmark <task number>: \n\tMark a task as done");
         response.append("\nunmark <task number>: \n\tMark a task as not done");
-        response.append("\ncheck due <date>: \n\tCheck for tasks that are due before the specified date (format: "
-                + Task.getInputDtfPattern() + ")");
+        response.append(
+                "\ncheck due <date>: \n\tCheck for tasks that are due before the specified date (format: "
+                        + Task.getInputDtfPattern()
+                        + ")");
+        response.append(
+                "\n"
+                        + "find <substring>: \n"
+                        + "\tFind tasks whose descriptions contain the given text (case-sensitive)");
 
         Ui.printResponse(response.toString());
     }
 
     /**
-     * Prints a fallback message for unrecognised commands along with the first token and echo.
+     * Prints a fallback message for unrecognised commands along with the first
+     * token and echo.
+     *
      * @param command the unrecognised input
      */
     public static void unknownCommand(String command) {
-        Ui.printResponse("Unrecognised command: \"" + command.split(" ")[0] + "\" Parrotting...\n" + command);
+        Ui.printResponse(
+                "Unrecognised command: \"" + command.split(" ")[0] + "\" Parrotting...\n" + command);
     }
 
+    /**
+     * Finds tasks whose descriptions contain the given substring and prints the
+     * matching tasks in a
+     * numbered list. Matching is case-sensitive. If there are no matches, prints a
+     * suitable message.
+     *
+     * @param string substring to search for within task descriptions
+     */
     public static void findCommand(String string) {
         StringBuilder response = new StringBuilder();
         ArrayList<Task> matches = new ArrayList<>();
 
-        tasklist.iterateTasks(task -> {
-            if (task.checkDescriptionContains(string)) {
-                matches.add(task);
-            }
-        });
+        tasklist.iterateTasks(
+                task -> {
+                    if (task.checkDescriptionContains(string)) {
+                        matches.add(task);
+                    }
+                });
 
         if (matches.isEmpty()) {
             response.append("No tasks found matching: \"" + string + "\"");

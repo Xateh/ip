@@ -6,8 +6,9 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 /**
- * Abstract base for tasks with Todo, Deadline and Event variants.
- * Provides parsing helpers, serialization, and due-date checks.
+ * Abstract base for tasks with Todo, Deadline and Event variants. Provides
+ * parsing helpers,
+ * serialization, and due-date checks.
  */
 public abstract class Task {
     private static String inputDtfPattern = "yyyy-MM-dd";
@@ -19,9 +20,10 @@ public abstract class Task {
     private boolean done;
 
     /**
-     * Serializes a task to a pipe-delimited save string.
-     * Example: |T|0|desc|, |D|1|desc|2025-01-01|, |E|0|desc|2025-01-01-2025-01-02|
-     * 
+     * Serializes a task to a pipe-delimited save string. Example: |T|0|desc|,
+     * |D|1|desc|2025-01-01|,
+     * |E|0|desc|2025-01-01-2025-01-02|
+     *
      * @param task the task to serialize
      * @return save string
      */
@@ -30,11 +32,7 @@ public abstract class Task {
         parts.add(
                 task instanceof ToDoTask
                         ? "T"
-                        : task instanceof DeadlineTask
-                                ? "D"
-                                : task instanceof EventTask
-                                        ? "E"
-                                        : "");
+                        : task instanceof DeadlineTask ? "D" : task instanceof EventTask ? "E" : "");
         parts.add(task.isDone() ? "1" : "0");
         parts.add(task.getDescription());
         if (task instanceof DeadlineTask) {
@@ -49,7 +47,7 @@ public abstract class Task {
 
     /**
      * Deserializes a task from its pipe-delimited save string.
-     * 
+     *
      * @param saveString the persisted representation
      * @return reconstructed Task
      * @throws IllegalArgumentException if the format is invalid or type unknown
@@ -59,22 +57,28 @@ public abstract class Task {
         if (parts.length < 3) {
             throw new IllegalArgumentException("Invalid task save string: " + saveString);
         } else {
-            return switch (parts[1]) {
-                case "T" -> new ToDoTask(parts[3], parts[2].equals("1"));
-                case "D" -> new DeadlineTask(parts[3], parts[4], parts[2].equals("1"));
-                case "E" ->
-                    new EventTask(parts[3], parts[4].split("-")[0], parts[4].split("-")[1], parts[2].equals("1"));
-                default -> throw new IllegalArgumentException("Unknown task type: " + parts[1]);
-            };
+            switch (parts[1]) {
+                case "T":
+                    return new ToDoTask(parts[3], parts[2].equals("1"));
+                case "D":
+                    return new DeadlineTask(parts[3], parts[4], parts[2].equals("1"));
+                case "E":
+                    return new EventTask(
+                            parts[3], parts[4].split("-")[0], parts[4].split("-")[1], parts[2].equals("1"));
+                default:
+                    throw new IllegalArgumentException("Unknown task type: " + parts[1]);
+            }
         }
     }
 
     /**
-     * Parses a user command into a Task.
-     * Returns a Pair where either the task or the exception is non-null.
-     * 
+     * Parses a user command into a Task. Returns a Pair where either the task or
+     * the exception is
+     * non-null.
+     *
      * @param task raw command (e.g., "todo ...", "deadline ... /by yyyy-MM-dd",
-     *             "event ... /from ... /to ...")
+     *             "event ... /from ...
+     *             /to ...")
      * @return pair of (Task, Exception)
      */
     public static Pair<Task, Exception> buildTask(String task) {
@@ -85,7 +89,8 @@ public abstract class Task {
                             ? new Pair<>(new DeadlineTask(task.substring(9).trim()), null)
                             : task.startsWith("event ")
                                     ? new Pair<>(new EventTask(task.substring(6).trim()), null)
-                                    : new Pair<>(null,
+                                    : new Pair<>(
+                                            null,
                                             new Exception("Specify Task Description: " + task + " <task description>"));
         } catch (Exception e) {
             return new Pair<>(null, e);
@@ -115,7 +120,7 @@ public abstract class Task {
 
     /**
      * Returns whether the task is completed.
-     * 
+     *
      * @return true if done
      */
     public boolean isDone() {
@@ -134,7 +139,7 @@ public abstract class Task {
 
     /**
      * Validates if a date string matches the expected input format.
-     * 
+     *
      * @param time date string
      * @return true if parseable using the input pattern
      */
@@ -149,7 +154,7 @@ public abstract class Task {
 
     /**
      * Returns the expected input date format pattern.
-     * 
+     *
      * @return input pattern
      */
     public static String getInputDtfPattern() {
@@ -158,7 +163,7 @@ public abstract class Task {
 
     /**
      * Returns the output date format pattern used for display.
-     * 
+     *
      * @return output pattern
      */
     public static String getOutputDtfPattern() {
@@ -168,16 +173,17 @@ public abstract class Task {
     /**
      * Determines if the task is due strictly before the given date (and not already
      * done).
-     * 
+     *
      * @param time date string in input format
      * @return true if due
      */
     public abstract boolean isDue(String time);
 
     /**
-     * Formats a date string for display using the output format,
-     * returning the original input if parsing fails.
-     * 
+     * Formats a date string for display using the output format, returning the
+     * original input if
+     * parsing fails.
+     *
      * @param time date string
      * @return formatted date or original input on parse failure
      */
@@ -195,9 +201,7 @@ public abstract class Task {
         return (isDone() ? "[X] " : "[ ] ") + getDescription();
     }
 
-    /**
-     * Todo task with only a description.
-     */
+    /** Todo task with only a description. */
     private static class ToDoTask extends Task {
         public ToDoTask(String task) {
             this(task, false);
@@ -218,15 +222,13 @@ public abstract class Task {
         }
     }
 
-    /**
-     * Deadline task with a due date.
-     */
+    /** Deadline task with a due date. */
     private static class DeadlineTask extends Task {
         private String deadline;
 
         /**
          * Extracts the deadline value from a command string.
-         * 
+         *
          * @param task raw command
          * @return extracted deadline or empty string
          */
@@ -258,7 +260,7 @@ public abstract class Task {
 
         /**
          * Returns the deadline date string.
-         * 
+         *
          * @return deadline
          */
         public String getDeadline() {
@@ -268,7 +270,8 @@ public abstract class Task {
         @Override
         public boolean isDue(String time) {
             try {
-                return !isDone() && LocalDate.parse(time, inputDtf).isAfter(LocalDate.parse(getDeadline(), inputDtf));
+                return !isDone()
+                        && LocalDate.parse(time, inputDtf).isAfter(LocalDate.parse(getDeadline(), inputDtf));
             } catch (Exception e) {
                 return false;
             }
@@ -280,9 +283,7 @@ public abstract class Task {
         }
     }
 
-    /**
-     * Event task spanning a start and end date.
-     */
+    /** Event task spanning a start and end date. */
     private static class EventTask extends Task {
         private String eventStartTime;
         private String eventEndTime;
@@ -293,7 +294,6 @@ public abstract class Task {
 
         public EventTask(String task, String eventStartTime, String eventEndTime) {
             this(task, eventStartTime, eventEndTime, false);
-
         }
 
         public EventTask(String task, String eventStartTime, String eventEndTime, boolean isDone) {
@@ -313,7 +313,7 @@ public abstract class Task {
 
         /**
          * Extracts the event start time from a command string.
-         * 
+         *
          * @param task raw command
          * @return extracted start time or empty string
          */
@@ -328,7 +328,7 @@ public abstract class Task {
 
         /**
          * Extracts the event end time from a command string.
-         * 
+         *
          * @param task raw command
          * @return extracted end time or empty string
          */
@@ -343,7 +343,7 @@ public abstract class Task {
 
         /**
          * Returns the event start date string.
-         * 
+         *
          * @return start date
          */
         public String getEventStartTime() {
@@ -352,7 +352,7 @@ public abstract class Task {
 
         /**
          * Returns the event end date string.
-         * 
+         *
          * @return end date
          */
         public String getEventEndTime() {
@@ -363,7 +363,8 @@ public abstract class Task {
         public boolean isDue(String time) {
             try {
                 return !isDone()
-                        && LocalDate.parse(time, inputDtf).isAfter(LocalDate.parse(getEventEndTime(), inputDtf));
+                        && LocalDate.parse(time, inputDtf)
+                                .isAfter(LocalDate.parse(getEventEndTime(), inputDtf));
             } catch (Exception e) {
                 return false;
             }
@@ -371,8 +372,13 @@ public abstract class Task {
 
         @Override
         public String toString() {
-            return "[E]" + super.toString() + " (from: " + printTime(getEventStartTime()) + " to: "
-                    + printTime(getEventEndTime()) + ")";
+            return "[E]"
+                    + super.toString()
+                    + " (from: "
+                    + printTime(getEventStartTime())
+                    + " to: "
+                    + printTime(getEventEndTime())
+                    + ")";
         }
     }
 }
