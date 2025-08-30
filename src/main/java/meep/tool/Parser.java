@@ -44,6 +44,8 @@ public class Parser {
                     Command.loadCommand();
                 } else if (message.startsWith("check due")) {
                     Command.checkDueCommand(message);
+                } else if (message.startsWith("find ")) {
+                    Command.findCommand(message.split(" ", 2)[1]);
                 } else {
                     Command.unknownCommand(message);
                 }

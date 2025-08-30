@@ -11,22 +11,21 @@ public abstract class Task {
     private static DateTimeFormatter inputDtf = DateTimeFormatter.ofPattern(inputDtfPattern);
     private static DateTimeFormatter outputDtf = DateTimeFormatter.ofPattern(outputDtfPattern);
 
-    private String task;
+    private String description;
     private boolean done;
 
     public static String saveString(Task task) {
         ArrayList<String> parts = new ArrayList<>();
         parts.add(
-            task instanceof ToDoTask
+                task instanceof ToDoTask
                         ? "T"
                         : task instanceof DeadlineTask
-                        ? "D"
-                        : task instanceof EventTask
-                        ? "E"
-                        : ""
-        );
+                                ? "D"
+                                : task instanceof EventTask
+                                        ? "E"
+                                        : "");
         parts.add(task.isDone() ? "1" : "0");
-        parts.add(task.getTask());
+        parts.add(task.getDescription());
         if (task instanceof DeadlineTask) {
             parts.add(((DeadlineTask) task).getDeadline());
         } else if (task instanceof EventTask) {
@@ -45,7 +44,8 @@ public abstract class Task {
             return switch (parts[1]) {
                 case "T" -> new ToDoTask(parts[3], parts[2].equals("1"));
                 case "D" -> new DeadlineTask(parts[3], parts[4], parts[2].equals("1"));
-                case "E" -> new EventTask(parts[3], parts[4].split("-")[0], parts[4].split("-")[1], parts[2].equals("1"));
+                case "E" ->
+                    new EventTask(parts[3], parts[4].split("-")[0], parts[4].split("-")[1], parts[2].equals("1"));
                 default -> throw new IllegalArgumentException("Unknown task type: " + parts[1]);
             };
         }
@@ -54,32 +54,37 @@ public abstract class Task {
     public static Pair<Task, Exception> buildTask(String task) {
         try {
             return task.startsWith("todo ")
-                ? new Pair<>(new ToDoTask(task.substring(5).trim()), null)
-                : task.startsWith("deadline ")
-                ? new Pair<>(new DeadlineTask(task.substring(9).trim()), null)
-                : task.startsWith("event ")
-                ? new Pair<>(new EventTask(task.substring(6).trim()), null)
-                : new Pair<>(null, new Exception("Specify Task Description: " + task + " <task description>"));
+                    ? new Pair<>(new ToDoTask(task.substring(5).trim()), null)
+                    : task.startsWith("deadline ")
+                            ? new Pair<>(new DeadlineTask(task.substring(9).trim()), null)
+                            : task.startsWith("event ")
+                                    ? new Pair<>(new EventTask(task.substring(6).trim()), null)
+                                    : new Pair<>(null,
+                                            new Exception("Specify Task Description: " + task + " <task description>"));
         } catch (Exception e) {
             return new Pair<>(null, e);
         }
     }
 
-    private Task(String task) {
-        this(task, false);
+    private Task(String description) {
+        this(description, false);
     }
 
-    private Task(String task, boolean isDone) {
-        if (task == null || task.trim().isEmpty()) {
+    private Task(String description, boolean isDone) {
+        if (description == null || description.trim().isEmpty()) {
             throw new IllegalArgumentException("Task Description cannot be null or empty");
         }
 
-        this.task = task;
+        this.description = description;
         this.done = isDone;
     }
 
-    public String getTask() {
-        return task;
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean checkDescriptionContains(String substring) {
+        return description.contains(substring);
     }
 
     public boolean isDone() {
@@ -124,7 +129,7 @@ public abstract class Task {
 
     @Override
     public String toString() {
-        return (isDone() ? "[X] " : "[ ] ") + getTask();
+        return (isDone() ? "[X] " : "[ ] ") + getDescription();
     }
 
     private static class ToDoTask extends Task {
@@ -170,7 +175,8 @@ public abstract class Task {
         public DeadlineTask(String task, String deadline, boolean isDone) {
             super(task, isDone);
             if (deadline == null || deadline.trim().isEmpty()) {
-                throw new IllegalArgumentException("Deadline cannot be null or empty: Please specify deadline time with /by");
+                throw new IllegalArgumentException(
+                        "Deadline cannot be null or empty: Please specify deadline time with /by");
             }
             this.deadline = deadline;
         }
@@ -178,7 +184,7 @@ public abstract class Task {
         public String getDeadline() {
             return deadline;
         }
-        
+
         @Override
         public boolean isDue(String time) {
             try {
@@ -210,10 +216,12 @@ public abstract class Task {
         public EventTask(String task, String eventStartTime, String eventEndTime, boolean isDone) {
             super(task, isDone);
             if (eventStartTime == null || eventStartTime.trim().isEmpty()) {
-                throw new IllegalArgumentException("Event start time cannot be null or empty: Please specify event start time with /from");
+                throw new IllegalArgumentException(
+                        "Event start time cannot be null or empty: Please specify event start time with /from");
             }
             if (eventEndTime == null || eventEndTime.trim().isEmpty()) {
-                throw new IllegalArgumentException("Event end time cannot be null or empty: Please specify event end time with /to");
+                throw new IllegalArgumentException(
+                        "Event end time cannot be null or empty: Please specify event end time with /to");
             }
 
             this.eventStartTime = eventStartTime;
@@ -249,7 +257,8 @@ public abstract class Task {
         @Override
         public boolean isDue(String time) {
             try {
-                return !isDone() && LocalDate.parse(time, inputDtf).isAfter(LocalDate.parse(getEventEndTime(), inputDtf));
+                return !isDone()
+                        && LocalDate.parse(time, inputDtf).isAfter(LocalDate.parse(getEventEndTime(), inputDtf));
             } catch (Exception e) {
                 return false;
             }
@@ -257,7 +266,8 @@ public abstract class Task {
 
         @Override
         public String toString() {
-            return "[E]" + super.toString() + " (from: " + printTime(getEventStartTime()) + " to: " + printTime(getEventEndTime()) + ")";
+            return "[E]" + super.toString() + " (from: " + printTime(getEventStartTime()) + " to: "
+                    + printTime(getEventEndTime()) + ")";
         }
     }
 }
