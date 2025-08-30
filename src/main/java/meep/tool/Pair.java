@@ -1,24 +1,47 @@
 package meep.tool;
 
+import java.util.Objects;
+
 /**
- * Simple immutable pair record holding two values.
+ * Simple immutable pair holding two values.
+ *
  * @param <F> first type
  * @param <S> second type
  */
-record Pair<F, S>(F first, S second) {
-     /**
-      * Returns the first value.
-      * @return first
-      */
-    public F getFirst() {
-        return first;
-    }
+final class Pair<F, S> {
+  private final F first;
+  private final S second;
 
-     /**
-      * Returns the second value.
-      * @return second
-      */
-    public S getSecond() {
-        return second;
-    }
+  Pair(F first, S second) {
+    this.first = first;
+    this.second = second;
+  }
+
+  /** Returns the first value. */
+  public F getFirst() {
+    return first;
+  }
+
+  /** Returns the second value. */
+  public S getSecond() {
+    return second;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Pair<?, ?> pair = (Pair<?, ?>) o;
+    return Objects.equals(first, pair.first) && Objects.equals(second, pair.second);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(first, second);
+  }
+
+  @Override
+  public String toString() {
+    return "Pair{" + String.valueOf(first) + ", " + String.valueOf(second) + "}";
+  }
 }
