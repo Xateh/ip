@@ -16,8 +16,8 @@ class MessageTest {
     void toStringTimestampFormatIsCorrect() {
         Message m = new Message("x");
         String s = m.toString();
-    // [YYYY-MM-DD HH:MM:SS] x
-    String regex = "\\[\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\] x";
-    assertTrue(s.matches(regex));
+        // [YYYY-MM-DD HH:MM:SS] x
+        String regex = "\\[\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\] x";
+        assertTrue(s.matches(regex));
     }
 }

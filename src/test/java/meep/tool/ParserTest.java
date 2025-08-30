@@ -9,7 +9,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
 class ParserTest {
     private final ByteArrayOutputStream out = new ByteArrayOutputStream();
     private PrintStream old;
@@ -18,8 +17,8 @@ class ParserTest {
     void setUp() {
         old = System.out;
         System.setOut(new PrintStream(out));
-    // Reset Storage path to default to avoid side effects from other tests
-    Storage.setSaveFile("data/meep.txt");
+        // Reset Storage path to default to avoid side effects from other tests
+        Storage.setSaveFile("data/meep.txt");
     }
 
     @AfterEach
@@ -32,7 +31,7 @@ class ParserTest {
         Parser.parse("hello");
         Parser.parse("how are you?");
         Parser.parse("list messages");
-    Parser.parse("list");
+        Parser.parse("list");
         Parser.parse("help");
         String s = out.toString();
         assertTrue(s.contains("Hello there!"));
@@ -53,14 +52,14 @@ class ParserTest {
         Parser.parse("save");
         Parser.parse("load");
         Parser.parse("check due 2025-08-30");
-    Parser.parse("unknown 123");
-    String s = out.toString();
-    assertTrue(s.contains("Got it. I've added this task:"));
-    assertTrue(s.contains("Tasks saved successfully."));
-    assertTrue(s.contains("Tasks loaded successfully."));
-    assertTrue(s.contains("Checking for due tasks on "));
-    assertTrue(s.contains("Unrecognised command: \"unknown\""));
-    assertTrue(s.contains("unknown 123"));
+        Parser.parse("unknown 123");
+        String s = out.toString();
+        assertTrue(s.contains("Got it. I've added this task:"));
+        assertTrue(s.contains("Tasks saved successfully."));
+        assertTrue(s.contains("Tasks loaded successfully."));
+        assertTrue(s.contains("Checking for due tasks on "));
+        assertTrue(s.contains("Unrecognised command: \"unknown\""));
+        assertTrue(s.contains("unknown 123"));
     }
 
     @Test
@@ -69,9 +68,10 @@ class ParserTest {
         Parser.parse("mark abc");
         Parser.parse("unmark abc");
         Parser.parse("delete abc");
-    String s = out.toString();
-    // Error message is produced by Parser via Ui when NumberFormatException is caught
-    int occurrences = s.split("Invalid task number.", -1).length - 1;
-    assertEquals(3, occurrences);
+        String s = out.toString();
+        // Error message is produced by Parser via Ui when NumberFormatException is
+        // caught
+        int occurrences = s.split("Invalid task number.", -1).length - 1;
+        assertEquals(3, occurrences);
     }
 }

@@ -32,7 +32,8 @@ class TaskListTest {
 
         AtomicInteger sumIdx = new AtomicInteger();
         list.iterateTasks((task, idx) -> {
-            if (idx == 0) assertTrue(task.toString().contains("t2"));
+            if (idx == 0)
+                assertTrue(task.toString().contains("t2"));
             sumIdx.addAndGet(idx + 1);
         });
         assertEquals(1, sumIdx.get());

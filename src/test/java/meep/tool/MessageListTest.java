@@ -39,8 +39,10 @@ class MessageListTest {
 
         AtomicInteger indexed = new AtomicInteger();
         list.iterateMessages((m, idx) -> {
-            if (idx == 0) assertTrue(m.toString().endsWith(" a"));
-            if (idx == 1) assertTrue(m.toString().endsWith(" b"));
+            if (idx == 0)
+                assertTrue(m.toString().endsWith(" a"));
+            if (idx == 1)
+                assertTrue(m.toString().endsWith(" b"));
             indexed.addAndGet(idx + 1);
         });
         assertEquals(3, indexed.get());
