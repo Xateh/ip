@@ -5,6 +5,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
+/**
+ * Base abstraction for a user task with completion status and optional time fields.
+ * Provides utilities for persistence and date formatting/validation.
+ */
 public abstract class Task {
     private static String inputDtfPattern = "yyyy-MM-dd";
     private static String outputDtfPattern = "MMM dd yyyy";
@@ -14,6 +18,12 @@ public abstract class Task {
     private String task;
     private boolean done;
 
+    /**
+     * Serialises a task into a pipe-delimited string suitable for file storage.
+     *
+     * @param task task to serialise
+     * @return the save string representation
+     */
     public static String saveString(Task task) {
         ArrayList<String> parts = new ArrayList<>();
         parts.add(
@@ -37,6 +47,13 @@ public abstract class Task {
         return String.format("|%s|", String.join("|", parts));
     }
 
+    /**
+     * Deserialises a task from a pipe-delimited save string.
+     *
+     * @param saveString the persisted representation
+     * @return a new Task instance
+     * @throws IllegalArgumentException if the string is malformed
+     */
     public static Task load(String saveString) {
         String[] parts = saveString.split("\\|");
         if (parts.length < 3) {
@@ -51,6 +68,12 @@ public abstract class Task {
         }
     }
 
+    /**
+     * Builds a concrete Task from a raw user command.
+     *
+     * @param task raw command text
+     * @return pair of (Task, Exception) where one will be non-null
+     */
     public static Pair<Task, Exception> buildTask(String task) {
         try {
             return task.startsWith("todo ")
@@ -69,6 +92,14 @@ public abstract class Task {
         this(task, false);
     }
 
+    /**
+     * Constructs a Task with description and completion status.
+     * Validates that the description is non-null and non-empty.
+     *
+     * @param task description
+     * @param isDone completion status
+     * @throws IllegalArgumentException if description invalid
+     */
     private Task(String task, boolean isDone) {
         if (task == null || task.trim().isEmpty()) {
             throw new IllegalArgumentException("Task Description cannot be null or empty");
@@ -78,22 +109,40 @@ public abstract class Task {
         this.done = isDone;
     }
 
+    /**
+     * Returns the task description.
+     *
+     * @return description
+     */
     public String getTask() {
         return task;
     }
 
+    /**
+     * Returns whether the task is marked as done.
+     *
+     * @return true if done
+     */
     public boolean isDone() {
         return done;
     }
 
+    /** Marks the task as done. */
     public void markDone() {
         done = true;
     }
 
+    /** Marks the task as not done. */
     public void markNotDone() {
         done = false;
     }
 
+    /**
+     * Validates that a date string matches the expected input formatter.
+     *
+     * @param time date string
+     * @return true if valid, false otherwise
+     */
     public static boolean checkTimeValid(String time) {
         try {
             LocalDate.parse(time, Task.inputDtf);
@@ -103,16 +152,32 @@ public abstract class Task {
         }
     }
 
+    /**
+     * Returns the expected input date format pattern.
+     *
+     * @return formatter pattern string
+     */
     public static String getInputDtfPattern() {
         return inputDtfPattern;
     }
 
+    /**
+     * Returns the human-friendly output date format pattern.
+     *
+     * @return formatter pattern string
+     */
     public static String getOutputDtfPattern() {
         return outputDtfPattern;
     }
 
     public abstract boolean isDue(String time);
 
+    /**
+     * Safely pretty-prints a date string; if parsing fails, returns the original text.
+     *
+     * @param time input date string
+     * @return pretty formatted date or original string if invalid
+     */
     static String printTime(String time) {
         try {
             LocalDate ldt = LocalDate.parse(time, inputDtf);
@@ -128,10 +193,21 @@ public abstract class Task {
     }
 
     private static class ToDoTask extends Task {
+        /**
+         * Constructs a todo task with the given description, not done by default.
+         *
+         * @param task description
+         */
         public ToDoTask(String task) {
             this(task, false);
         }
 
+        /**
+         * Constructs a todo task with description and status.
+         *
+         * @param task description
+         * @param isDone completion status
+         */
         public ToDoTask(String task, boolean isDone) {
             super(task, isDone);
         }
@@ -150,6 +226,10 @@ public abstract class Task {
     private static class DeadlineTask extends Task {
         private String deadline;
 
+        /**
+         * Extracts the deadline substring after "/by" from a raw command.
+         * Returns an empty string if not found.
+         */
         private static String extractDeadline(String task) {
             for (String command : task.split("/")) {
                 if (command.startsWith("by")) {
@@ -159,14 +239,32 @@ public abstract class Task {
             return "";
         }
 
+        /**
+         * Constructs a deadline task from a raw command containing "/by".
+         *
+         * @param task raw command
+         */
         public DeadlineTask(String task) {
             this(task.split("/", 2)[0], extractDeadline(task));
         }
 
+        /**
+         * Constructs a deadline task with explicit description and deadline.
+         *
+         * @param task description
+         * @param deadline date string matching {@link #inputDtf}
+         */
         public DeadlineTask(String task, String deadline) {
             this(task, deadline, false);
         }
 
+        /**
+         * Constructs a deadline task with description, deadline and status.
+         *
+         * @param task description
+         * @param deadline date string
+         * @param isDone completion status
+         */
         public DeadlineTask(String task, String deadline, boolean isDone) {
             super(task, isDone);
             if (deadline == null || deadline.trim().isEmpty()) {
@@ -175,6 +273,7 @@ public abstract class Task {
             this.deadline = deadline;
         }
 
+        /** Returns the deadline string as provided by the user. */
         public String getDeadline() {
             return deadline;
         }
@@ -198,15 +297,26 @@ public abstract class Task {
         private String eventStartTime;
         private String eventEndTime;
 
+    /**
+     * Constructs an event task from a raw command containing "/from" and "/to".
+     *
+     * @param task raw command
+     */
         public EventTask(String task) {
             this(task.split("/", 2)[0], EventTask.extractStartTime(task), EventTask.extractEndTime(task));
         }
 
+    /**
+     * Constructs an event task with explicit description and time range.
+     */
         public EventTask(String task, String eventStartTime, String eventEndTime) {
             this(task, eventStartTime, eventEndTime, false);
 
         }
 
+    /**
+     * Constructs an event task with description, time range and status.
+     */
         public EventTask(String task, String eventStartTime, String eventEndTime, boolean isDone) {
             super(task, isDone);
             if (eventStartTime == null || eventStartTime.trim().isEmpty()) {
@@ -220,7 +330,8 @@ public abstract class Task {
             this.eventEndTime = eventEndTime;
         }
 
-        private static String extractStartTime(String task) {
+    /** Extracts the start time substring after "/from"; empty if not found. */
+    private static String extractStartTime(String task) {
             for (String command : task.split("/")) {
                 if (command.startsWith("from")) {
                     return command.substring(5).trim();
@@ -229,7 +340,8 @@ public abstract class Task {
             return "";
         }
 
-        private static String extractEndTime(String task) {
+    /** Extracts the end time substring after "/to"; empty if not found. */
+    private static String extractEndTime(String task) {
             for (String command : task.split("/")) {
                 if (command.startsWith("to")) {
                     return command.substring(3).trim();
@@ -238,10 +350,12 @@ public abstract class Task {
             return "";
         }
 
+    /** Returns the event start time string. */
         public String getEventStartTime() {
             return eventStartTime;
         }
 
+    /** Returns the event end time string. */
         public String getEventEndTime() {
             return eventEndTime;
         }

@@ -7,9 +7,20 @@ import java.io.PrintWriter;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+/**
+ * Persistence helper for saving and loading tasks to a simple text file.
+ */
 class Storage {
     private static String FILE_PATH = "data/meep.txt";
 
+     /**
+      * Saves all tasks to the configured file path.
+      * Each task is written on a single line using {@link Task#saveString(Task)}.
+      *
+      * @param tasklist the tasks to persist
+      * @param response buffer to append error messages to
+      * @return true if save succeeds, false otherwise
+      */
     public static boolean saveTasks(TaskList tasklist, StringBuilder response) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH))) {
             tasklist.iterateTasks(task -> writer.println(Task.saveString(task)));
@@ -20,6 +31,14 @@ class Storage {
         }
     }
 
+     /**
+      * Loads tasks from the configured file path into the provided task list.
+      * Malformed lines are skipped and flagged via the return value.
+      *
+      * @param tasklist target list to populate
+      * @param response buffer to append error messages to
+      * @return true if all lines are loaded successfully; false if file missing or malformed entries encountered
+      */
     public static boolean loadTasks(TaskList tasklist, StringBuilder response) {
         File file = new File(FILE_PATH);
         if (!file.exists()) {
@@ -45,6 +64,11 @@ class Storage {
         return flag;
     }
 
+    /**
+     * Overrides the save/load file path. Intended for tests.
+     *
+     * @param path new file path
+     */
     public static void setSaveFile(String path) {
         FILE_PATH = path;
     }

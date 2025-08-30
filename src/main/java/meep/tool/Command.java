@@ -5,25 +5,50 @@ import java.util.ArrayList;
 
 import meep.ui.Ui;
 
+/**
+ * Command handlers for the Meep application. Each method corresponds to a
+ * user-invoked operation and is responsible for formatting the UI response.
+ */
 class Command {
     private static MessageList messages = new MessageList();
     private static TaskList tasklist = new TaskList();
 
+     /**
+      * Records a raw user message.
+      *
+      * @param message the message to store
+      * @return true once stored
+      */
     public static boolean addMessage(String message) {
         messages.addMessage(message);
         return true;
     }
 
+     /**
+      * Greets the user.
+      *
+      * @return true when the response is printed
+      */
     public static boolean helloCommand() {
         Ui.printResponse("Hello there!");
         return true;
     }
 
+     /**
+      * Replies to a courtesy check-in.
+      *
+      * @return true when the response is printed
+      */
     public static boolean howAreYouCommand() {
         Ui.printResponse("I'm just a program, but thanks for asking!");
         return true;
     }
 
+     /**
+      * Lists all recorded messages.
+      *
+      * @return true when the response is printed
+      */
     public static boolean listMessageCommand() {
         StringBuilder response = new StringBuilder();
 
@@ -34,6 +59,11 @@ class Command {
         return true;
     }
 
+    /**
+     * Lists all tasks with their completion status.
+     *
+     * @return true when the response is printed
+     */
     public static boolean listCommand() {
         StringBuilder response = new StringBuilder();
 
@@ -44,6 +74,12 @@ class Command {
         return true;
     }
 
+    /**
+     * Marks the given task number as done.
+     *
+     * @param taskNumber 1-based task index as shown in list
+     * @return true if operation succeeds; false if invalid index
+     */
     public static boolean markCommand(int taskNumber) {
         StringBuilder response = new StringBuilder();
         try {
@@ -58,6 +94,12 @@ class Command {
         return true;
     }
 
+    /**
+     * Marks the given task number as not done.
+     *
+     * @param taskNumber 1-based task index as shown in list
+     * @return true if operation succeeds; false if invalid index
+     */
     public static boolean unmarkCommand(int taskNumber) {
         StringBuilder response = new StringBuilder();
         try {
@@ -72,6 +114,12 @@ class Command {
         return true;
     }
 
+    /**
+     * Deletes the task at the given number.
+     *
+     * @param taskNumber 1-based task index as shown in list
+     * @return true if operation succeeds; false if invalid index
+     */
     public static boolean deleteCommand(int taskNumber) {
         StringBuilder response = new StringBuilder();
         try {
@@ -86,6 +134,13 @@ class Command {
         return true;
     }
 
+    /**
+     * Attempts to create and add a task from the raw command string.
+     * Supports todo, deadline and event.
+     *
+     * @param message the raw add command line
+     * @return true when a response is printed
+     */
     public static boolean addTask(String message) {
         StringBuilder response = new StringBuilder();
         
@@ -101,6 +156,11 @@ class Command {
         return true;
     }
 
+    /**
+     * Saves tasks to disk and prints a status message.
+     *
+     * @return true if save succeeded; false otherwise
+     */
     public static boolean saveCommand() {
         StringBuilder response = new StringBuilder();
         boolean flag = Storage.saveTasks(tasklist, response);
@@ -113,6 +173,11 @@ class Command {
         return flag;
     }
 
+    /**
+     * Loads tasks from disk and prints a status message.
+     *
+     * @return true if load succeeded; false otherwise
+     */
     public static boolean loadCommand() {
         StringBuilder response = new StringBuilder();
         boolean flag = Storage.loadTasks(tasklist, response);
@@ -125,6 +190,13 @@ class Command {
         return flag;
     }
 
+    /**
+     * Checks for tasks due before the provided date string.
+     * The date format must match {@link Task#getInputDtfPattern()}.
+     *
+     * @param message full command string containing the date after "check due"
+     * @return true if all checks succeed; false if any parsing errors occur
+     */
     public static boolean checkDueCommand(String message) {
         StringBuilder response = new StringBuilder();
         String time = message.substring(9).trim();
@@ -153,6 +225,9 @@ class Command {
         return flags.stream().allMatch(flag -> flag);
     }
 
+    /**
+     * Prints help text describing available commands.
+     */
     public static void helpCommand() {
         StringBuilder response = new StringBuilder();
         response.append("Here are the list of commands! [case-sensitive]\n");
@@ -171,6 +246,11 @@ class Command {
         Ui.printResponse(response.toString());
     }
 
+    /**
+     * Fallback for unknown commands. Echos the first token and the raw input.
+     *
+     * @param command the raw input line
+     */
     public static void unknownCommand(String command) {
         Ui.printResponse("Unrecognised command: \"" + command.split(" ")[0] + "\" Parrotting...\n" + command);
     }

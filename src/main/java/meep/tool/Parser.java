@@ -4,7 +4,16 @@ import java.util.Arrays;
 
 import meep.ui.Ui;
 
+/**
+ * Parses raw user input and dispatches to the corresponding command handlers.
+ */
 public class Parser {
+     /**
+      * Parses a single line command and invokes the appropriate Command method.
+      * Adds the raw message to the message list before handling.
+      *
+      * @param message the user input line
+      */
     public static void parse(String message) {
         Command.addMessage(message);
 
