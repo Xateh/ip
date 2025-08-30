@@ -8,6 +8,13 @@ repositories {
     mavenCentral()
 }
 
+java {
+    // Ensure we compile and run with JDK 17 features (records, switch expressions)
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.0'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.0'
@@ -28,7 +35,8 @@ test {
 }
 
 application {
-    mainClass.set("seedu.duke.Duke")
+    // Point to the actual entrypoint with a main method
+    mainClass.set("meep.ui.Meep")
 }
 
 shadowJar {
