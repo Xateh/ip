@@ -1,10 +1,10 @@
-# Duke User Guide
+# Meep User Guide
 
 // Update the title above to match the actual product name
 
 // Product screenshot goes here
 
-// Product intro goes here
+Meep is a simple CLI task and message manager. Type commands like `todo`, `deadline`, `event`, `list`, `mark`, `unmark`, `delete`, `save`, `load`, `check`, `help`, and `bye` to interact.
 
 ## Adding deadlines
 
@@ -19,6 +19,18 @@ Example: `keyword (optional arguments)`
 ```
 expected output
 ```
+
+## Developer docs
+
+JavaDoc HTML is generated with Gradle.
+
+Try it:
+
+```bash
+./gradlew javadoc
+```
+
+Then open `build/docs/javadoc/index.html` in a browser.
 
 ## Feature ABC
 
