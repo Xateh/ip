@@ -3,6 +3,7 @@ plugins {
     id 'application'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'com.diffplug.spotless' version '6.25.0'
+    id 'checkstyle'
 }
 
 repositories {
@@ -60,7 +61,23 @@ spotless {
     }
 }
 
+// Basic Checkstyle setup. The default config file location is config/checkstyle/checkstyle.xml
+checkstyle {
+    // Use a conservative version compatible with Gradle 7.6.x
+    toolVersion = '10.3.4'
+    // Do not fail the build initially; change to false once the codebase is clean
+    ignoreFailures = true
+}
+
+// Friendlier reports: HTML on, XML off
+tasks.withType(Checkstyle).configureEach {
+    reports {
+        xml.required = false
+        html.required = true
+    }
+}
+
 // Enforce formatting on CI via the standard 'check' lifecycle
 tasks.named('check') {
-    dependsOn 'spotlessCheck'
+    dependsOn 'spotlessCheck', 'checkstyleMain', 'checkstyleTest'
 }
