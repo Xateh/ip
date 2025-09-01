@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!-- Minimal, Gradle-friendly Checkstyle configuration.
+     Start permissive; tighten rules gradually. -->
+<module name="Checker">
+    <property name="severity" value="warning"/>
+
+    <!-- Use UTF-8 across the project -->
+    <property name="charset" value="UTF-8"/>
+
+    <!-- Optional suppression filter; keep empty until needed -->
+    <module name="SuppressionFilter">
+        <property name="file" value="${config_loc}/suppressions.xml"/>
+    </module>
+
+    <!-- TreeWalker holds most Java checks -->
+    <module name="TreeWalker">
+        <!-- Javadoc (SE-EDU expects docs for public API) -->
+        <module name="JavadocType">
+            <property name="scope" value="public"/>
+        </module>
+        <module name="JavadocMethod">
+            <property name="accessModifiers" value="public"/>
+        </module>
+
+        <!-- Naming conventions -->
+        <module name="TypeName"/>
+        <module name="MethodName"/>
+        <module name="ParameterName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="ConstantName"/>
+
+        <!-- Modifiers and visibility -->
+        <module name="ModifierOrder"/>
+        <module name="RedundantModifier"/>
+        <module name="VisibilityModifier"/>
+
+        <!-- Imports and unused code (let Spotless/google-java-format handle ordering) -->
+        <module name="UnusedImports"/>
+        <module name="RedundantImport"/>
+        <module name="AvoidStarImport"/>
+
+        <!-- Braces and whitespace basics -->
+        <module name="LeftCurly"/>
+        <module name="RightCurly"/>
+        <module name="NeedBraces"/>
+        <module name="WhitespaceAround"/>
+        <module name="WhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+        <module name="MethodParamPad"/>
+        <module name="ParenPad"/>
+
+        <!-- Code style sanity -->
+        <module name="EmptyBlock"/>
+        <module name="EmptyStatement"/>
+        <module name="TrailingComment"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="MissingSwitchDefault"/>
+        <module name="FallThrough"/>
+        <module name="EmptyCatchBlock">
+            <property name="exceptionVariableName" value="(ignored|expected)"/>
+            <property name="commentFormat" value="(?i)ignored|expected|todo"/>
+        </module>
+    </module>
+
+    <!-- File length and line length (soft) -->
+    <module name="FileLength">
+        <property name="max" value="2000"/>
+    </module>
+    <module name="LineLength">
+        <!-- Soft cap to 120, but ignore long import/package lines and URLs -->
+        <property name="max" value="120"/>
+        <property name="ignorePattern" value="^package|^import|https?://"/>
+        <property name="severity" value="info"/>
+    </module>
+
+    <!-- Newline at EOF -->
+    <module name="NewlineAtEndOfFile"/>
+</module>

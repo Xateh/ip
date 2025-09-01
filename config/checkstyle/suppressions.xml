@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Experimental 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+<suppressions>
+    <!-- Allow underscores in JUnit test method names (e.g., given_when_then) -->
+    <suppress checks="MethodName" files="src/test/java/.+Test\.java" />
+</suppressions>
