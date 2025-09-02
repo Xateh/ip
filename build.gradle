@@ -72,7 +72,7 @@ spotless {
         googleJavaFormat('1.19.2').reflowLongStrings()
         trimTrailingWhitespace()
         endWithNewline()
-        indentWithTab()
+        indentWithTabs()
     }
 }
 

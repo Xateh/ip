@@ -203,11 +203,11 @@ public abstract class Task {
 
     /** Todo task with only a description. */
     private static class ToDoTask extends Task {
-        public ToDoTask(String task) {
+        ToDoTask(String task) {
             this(task, false);
         }
 
-        public ToDoTask(String task, boolean isDone) {
+        ToDoTask(String task, boolean isDone) {
             super(task, isDone);
         }
 
@@ -241,15 +241,15 @@ public abstract class Task {
             return "";
         }
 
-        public DeadlineTask(String task) {
+        DeadlineTask(String task) {
             this(task.split("/", 2)[0], extractDeadline(task));
         }
 
-        public DeadlineTask(String task, String deadline) {
+        DeadlineTask(String task, String deadline) {
             this(task, deadline, false);
         }
 
-        public DeadlineTask(String task, String deadline, boolean isDone) {
+        DeadlineTask(String task, String deadline, boolean isDone) {
             super(task, isDone);
             if (deadline == null || deadline.trim().isEmpty()) {
                 throw new IllegalArgumentException(
@@ -288,15 +288,15 @@ public abstract class Task {
         private String eventStartTime;
         private String eventEndTime;
 
-        public EventTask(String task) {
+        EventTask(String task) {
             this(task.split("/", 2)[0], EventTask.extractStartTime(task), EventTask.extractEndTime(task));
         }
 
-        public EventTask(String task, String eventStartTime, String eventEndTime) {
+        EventTask(String task, String eventStartTime, String eventEndTime) {
             this(task, eventStartTime, eventEndTime, false);
         }
 
-        public EventTask(String task, String eventStartTime, String eventEndTime, boolean isDone) {
+        EventTask(String task, String eventStartTime, String eventEndTime, boolean isDone) {
             super(task, isDone);
             if (eventStartTime == null || eventStartTime.trim().isEmpty()) {
                 throw new IllegalArgumentException(

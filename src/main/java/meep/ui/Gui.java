@@ -5,8 +5,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
+/**
+ * Minimal JavaFX UI for Meep that displays a simple greeting.
+ */
 public class Gui extends Application {
 
+     /**
+      * Configures and shows the primary JavaFX stage.
+      *
+      * @param stage the primary stage provided by the runtime
+      */
     @Override
     public void start(Stage stage) {
         Label helloWorld = new Label("Hello World!"); // Creating a new Label control
