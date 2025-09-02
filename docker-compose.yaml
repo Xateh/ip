@@ -1,0 +1,10 @@
+services:
+  desktop:
+    volumes:
+      - ./:/mnt/
+    tty: true
+    build:
+      context: ./docker
+    ports:
+      - 2201:2201
+      - 6080:6080

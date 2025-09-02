@@ -1,0 +1,65 @@
+{
+    "name": "Container",
+    "dockerComposeFile": "../docker-compose.yml",
+    "features": {
+        "ghcr.io/devcontainers/features/desktop-lite:1": {}
+    },
+    "forwardPorts": [
+        2201,
+        6080
+    ],
+    "portsAttributes": {
+        "2201": {
+            "label": "SSH"
+        },
+        "6080": {
+            "label": "desktop"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "JaehyunShim.vscode-ros2",
+                "nonanonno.vscode-ros2",
+                "vscjava.vscode-java-pack",
+                "eamodio.gitlens",
+                "ms-vscode.cpptools-extension-pack",
+                "donjayamanne.python-extension-pack",
+                "althack.ament-task-provider",
+                "betwo.b2-catkin-tools",
+                "DotJoshJohnson.xml",
+                "ms-azuretools.vscode-docker",
+                "ms-iot.vscode-ros",
+                "ms-python.python",
+                "ms-vscode.cpptools",
+                "redhat.vscode-yaml",
+                "smilerobotics.urdf",
+                "streetsidesoftware.code-spell-checker",
+                "twxs.cmake",
+                "yzhang.markdown-all-in-one",
+                "zachflower.uncrustify",
+                "ms-toolsai.jupyter-renderers"
+            ],
+            "settings": {
+                "files.autoSave": "afterDelay",
+                "workbench.startupEditor": "none",
+                "git.autofetch": true,
+                "git.enableSmartCommit": true,
+                "cmake.configureOnOpen": true,
+                "cmake.showOptionsMovedNotification": false,
+                "remoteHub.commitDirectlyWarning": "off",
+                "makefile.configureOnOpen": true,
+                "files.associations": {
+                    "*.makefile": "makefile",
+                    "*.make": "makefile"
+                },
+                "[makefile]": {
+                    "editor.insertSpaces": false
+                },
+                "python.languageServer": "Pylance",
+                "python.analysis.languageServerMode": "full",
+                "python.analysis.typeCheckingMode": "standard"
+            }
+        }
+    }
+}

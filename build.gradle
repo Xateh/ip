@@ -53,7 +53,8 @@ test {
 
 application {
     // Point to the actual entrypoint with a main method
-    mainClass.set("meep.ui.Meep")
+    // Default to GUI launcher
+    mainClass.set("meep.ui.Launcher")
 }
 
 shadowJar {
@@ -62,6 +63,15 @@ shadowJar {
 }
 
 run{
+    standardInput = System.in
+}
+
+// Optional: run the CLI explicitly (useful in headless environments)
+tasks.register('runCli', JavaExec) {
+    group = 'application'
+    description = 'Run the Meep CLI (headless-friendly)'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'meep.ui.Meep'
     standardInput = System.in
 }
 

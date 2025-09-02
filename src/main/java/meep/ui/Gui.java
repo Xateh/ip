@@ -8,6 +8,8 @@ import javafx.stage.Stage;
 /** Minimal JavaFX UI for Meep that displays a simple greeting. */
 public class Gui extends Application {
 
+	private static final String DEFAULT_FILE_PATH = "meep/example.txt";
+
 	/**
 	 * Configures and shows the primary JavaFX stage.
 	 *
@@ -21,5 +23,13 @@ public class Gui extends Application {
 
 		stage.setScene(scene); // Setting the stage to show our scene
 		stage.show(); // Render the stage.
+	}
+
+	public Gui(String filePath) {
+		start(new Stage());
+	}
+
+	public Gui() {
+		this(DEFAULT_FILE_PATH);
 	}
 }
