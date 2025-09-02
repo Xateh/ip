@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles version="21">
+  <profile kind="CodeFormatterProfile" name="Spotless-Eclipse" version="21">
+    <!-- General -->
+    <setting id="org.eclipse.jdt.core.formatter.tabulation.char" value="tab"/>
+    <setting id="org.eclipse.jdt.core.formatter.tabulation.size" value="4"/>
+    <setting id="org.eclipse.jdt.core.formatter.indentation.size" value="4"/>
+    <setting id="org.eclipse.jdt.core.formatter.lineSplit" value="120"/>
+
+    <!-- Keep braces and whitespace straightforward; other settings left default -->
+  <setting id="org.eclipse.jdt.core.formatter.join_wrapped_lines" value="false"/>
+    <setting id="org.eclipse.jdt.core.formatter.wrap_before_binary_operator" value="true"/>
+  <setting id="org.eclipse.jdt.core.formatter.wrap_before_conditional_operator" value="true"/>
+  <setting id="org.eclipse.jdt.core.formatter.alignment_for_conditional_expression" value="16"/>
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_assignment" value="48"/>
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_binary_expression" value="16"/>
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_parameters_in_method_declaration" value="16"/>
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_arguments_in_method_invocation" value="16"/>
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_enum_constants" value="16"/>
+  <setting id="org.eclipse.jdt.core.formatter.keep_simple_if_on_one_line" value="false"/>
+  <setting id="org.eclipse.jdt.core.formatter.keep_simple_for_on_one_line" value="false"/>
+  <setting id="org.eclipse.jdt.core.formatter.keep_simple_while_on_one_line" value="false"/>
+  <setting id="org.eclipse.jdt.core.formatter.keep_simple_methods_on_one_line" value="false"/>
+  </profile>
+</profiles>

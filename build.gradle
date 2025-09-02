@@ -69,10 +69,11 @@ spotless {
     java {
         target 'src/**/*.java'
         importOrder()
-        googleJavaFormat('1.19.2').reflowLongStrings()
+        googleJavaFormat('1.19.2').aosp().reflowLongStrings()
+        eclipse().configFile('config/spotless/eclipse-java-formatter.xml')
         trimTrailingWhitespace()
         endWithNewline()
-        indentWithTabs()
+        indentWithTabs(4)
     }
 }
 
