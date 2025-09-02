@@ -145,9 +145,9 @@ class Command {
         StringBuilder response = new StringBuilder();
 
         Pair<Task, Exception> buildPair = Task.buildTask(message);
-        if (buildPair.getSecond() != null)
+        if (buildPair.getSecond() != null) {
             response.append(buildPair.getSecond().getMessage());
-        else {
+        } else {
             tasklist.addTask(buildPair.getFirst());
             response.append("Got it. I've added this task:\n" + buildPair.getFirst());
             response.append("\nNow you have " + tasklist.size() + " tasks in the list.");
