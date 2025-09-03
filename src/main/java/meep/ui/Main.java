@@ -7,12 +7,12 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-  @Override
-  public void start(Stage stage) {
-    Label helloWorld = new Label("Hello World!"); // Creating a new Label control
-    Scene scene = new Scene(helloWorld); // Setting the scene to be our Label
+	@Override
+	public void start(Stage stage) {
+		Label helloWorld = new Label("Hello World!"); // Creating a new Label control
+		Scene scene = new Scene(helloWorld); // Setting the scene to be our Label
 
-    stage.setScene(scene); // Setting the stage to show our scene
-    stage.show(); // Render the stage.
-  }
+		stage.setScene(scene); // Setting the stage to show our scene
+		stage.show(); // Render the stage.
+	}
 }
