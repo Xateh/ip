@@ -53,7 +53,6 @@ test {
 
 application {
     // Point to the actual entrypoint with a main method
-    // Default to GUI launcher
     mainClass.set("meep.ui.Launcher")
 }
 
