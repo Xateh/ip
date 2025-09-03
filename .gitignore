@@ -15,11 +15,12 @@ bin/
 
 /text-ui-test/ACTUAL.TXT
 text-ui-test/EXPECTED-UNIX.TXT
-# pixi environments
-.pixi/*
-.pixi/config.toml
-pixi*
 
 .vscode/
 
 .git*
+
+# pixi environments
+.pixi/*
+.pixi/config.toml
+pixi*
