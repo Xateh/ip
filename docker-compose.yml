@@ -1,0 +1,12 @@
+services:
+  desktop:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: container
+    tty: true
+    volumes:
+      - ./:/workspaces/ip/
+    ports:
+      - 2201:2201
+      - 6080:6080
