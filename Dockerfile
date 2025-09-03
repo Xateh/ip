@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/vscode/devcontainers/universal:latest
+FROM ubuntu:latest
 
 ARG ADDITIONAL_APT_PACKAGES=" \
 # General Utilities
@@ -14,7 +14,7 @@ ARG ADDITIONAL_APT_PACKAGES=" \
     tmux \
 "
 
-RUN apt-get update && apt-get install ADDITIONAL_APT_PACKAGES
+RUN apt-get update && apt-get install -y ${ADDITIONAL_APT_PACKAGES}
 
 RUN curl -fsSL https://pixi.sh/install.sh | sh
 
