@@ -1,0 +1,40 @@
+{
+    "name": "Container",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "desktop",
+    "workspaceFolder": "/workspaces/ip/",
+    "features": {
+        "ghcr.io/devcontainers/features/desktop-lite:1": {}
+    },
+    "forwardPorts": [2201, 6080],
+    "portsAttributes": {
+        "2201": {
+            "label": "SSH"
+        },
+        "6080": {
+            "label": "desktop"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "vscjava.vscode-java-pack",
+                "eamodio.gitlens",
+                "DotJoshJohnson.xml",
+                "ms-azuretools.vscode-docker",
+                "redhat.vscode-yaml",
+                "smilerobotics.urdf",
+                "streetsidesoftware.code-spell-checker",
+                "ms-toolsai.jupyter-renderers"
+            ],
+            "settings": {
+                "files.autoSave": "afterDelay",
+                "workbench.startupEditor": "none",
+                "git.autofetch": true,
+                "git.enableSmartCommit": true,
+                "remoteHub.commitDirectlyWarning": "off",
+                "makefile.configureOnOpen": true
+            }
+        }
+    }
+}
