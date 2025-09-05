@@ -57,7 +57,7 @@ application {
 }
 
 shadowJar {
-    archiveBaseName = "duke"
+    archiveBaseName = "meep"
     archiveClassifier = null
 }
 
@@ -108,5 +108,5 @@ tasks.named('check') {
 }
 
 tasks.register('compileRun') {
-    dependsOn 'check', 'clean', 'build', 'run'
+    dependsOn 'spotlessApply', 'check', 'clean', 'build', 'run'
 }
