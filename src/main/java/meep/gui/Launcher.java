@@ -1,4 +1,4 @@
-package meep.ui;
+package meep.gui;
 
 import javafx.application.Application;
 

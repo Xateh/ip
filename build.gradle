@@ -53,7 +53,7 @@ test {
 
 application {
     // Point to the actual entrypoint with a main method
-    mainClass.set("meep.ui.Launcher")
+    mainClass.set("meep.gui.Launcher")
 }
 
 shadowJar {
@@ -61,7 +61,7 @@ shadowJar {
     archiveClassifier = null
 }
 
-run{
+run {
     standardInput = System.in
 }
 
@@ -105,4 +105,8 @@ tasks.withType(Checkstyle).configureEach {
 // Enforce formatting on CI via the standard 'check' lifecycle
 tasks.named('check') {
     dependsOn 'spotlessCheck', 'checkstyleMain', 'checkstyleTest'
+}
+
+tasks.register('compileRun') {
+    dependsOn 'check', 'clean', 'build', 'run'
 }
