@@ -1,23 +1,45 @@
 package meep.ui;
 
+import meep.tool.Command;
+import meep.tool.Pair;
 import meep.tool.Parser;
 
-/** Application entry point for Meep. Runs a simple REPL until the user types "bye". */
+/**
+ * Application entry point for Meep. Runs a simple REPL until the user types
+ * "bye".
+ */
 public class Meep {
-  /**
-   * Starts the Meep CLI.
-   *
-   * @param args ignored
-   */
-  public static void main(String[] args) {
-    Ui.printResponse("Hello from Meep!\nWhat can I do for you?");
+	/**
+	 * Starts the Meep CLI.
+	 *
+	 * @param args
+	 *            ignored
+	 */
+	public static void main(String[] args) {
+		Ui.printResponse("Hello from Meep!\nWhat can I do for you?");
 
-    String message = "";
-    message = Ui.readCommand();
-    while (!message.equals("bye")) {
-      Parser.parse(message);
-      message = Ui.readCommand();
-    }
-    Ui.printResponse("Bye. Hope to see you again soon!");
-  }
+		String message = "";
+		message = Ui.readCommand();
+		while (!message.equals("bye")) {
+			Command c = Parser.parse(message);
+			if (c != null) {
+				String response = c.execute();
+				if (response != null && !response.isEmpty()) {
+					Ui.printResponse(response);
+				}
+			}
+			message = Ui.readCommand();
+		}
+		Ui.printResponse("Bye. Hope to see you again soon!");
+	}
+
+	/** Generates a response for the user's chat message. */
+	public Pair<String, String> getResponse(String input) {
+		try {
+			Command c = Parser.parseQuiet(input);
+			return new Pair<>(c.execute(), c.getClass().getSimpleName());
+		} catch (Exception e) {
+			return new Pair<>("Error: " + e.getMessage(), "Error");
+		}
+	}
 }

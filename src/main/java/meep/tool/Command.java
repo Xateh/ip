@@ -2,305 +2,332 @@ package meep.tool;
 
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import meep.ui.Ui;
 
 /**
- * Central command handler for Meep. Contains static methods that mutate the
- * in-memory message and
- * task lists and print responses via {@link meep.ui.Ui}.
+ * Central command handler for Meep. Implements the Command pattern where each
+ * concrete operation is a subclass overriding {@link #execute()}.
  */
-class Command {
-    private static MessageList messages = new MessageList();
-    private static TaskList tasklist = new TaskList();
+public abstract class Command {
+	// Shared application state for all commands
+	protected static MessageList messages = new MessageList();
+	protected static TaskList tasklist = new TaskList();
 
-    /**
-     * Adds a raw input message to the internal message list.
-     *
-     * @param message user input
-     * @return true if the operation completes
-     */
-    public static boolean addMessage(String message) {
-        messages.addMessage(message);
-        return true;
-    }
+	/**
+	 * Executes the command and returns the response text. Return an empty string if
+	 * there is nothing to print.
+	 */
+	public abstract String execute();
 
-    /**
-     * Prints a hello response.
-     *
-     * @return true always
-     */
-    public static boolean helloCommand() {
-        Ui.printResponse("Hello there!");
-        return true;
-    }
+	/** Adds a raw input message to the message list. */
+	static class AddMessageCommand extends Command {
+		private final String message;
 
-    /**
-     * Prints a canned "how are you" response.
-     *
-     * @return true always
-     */
-    public static boolean howAreYouCommand() {
-        Ui.printResponse("I'm just a program, but thanks for asking!");
-        return true;
-    }
+		AddMessageCommand(String message) {
+			this.message = message;
+		}
 
-    /**
-     * Prints all stored messages in order with 1-based numbering.
-     *
-     * @return true always
-     */
-    public static boolean listMessageCommand() {
-        StringBuilder response = new StringBuilder();
+		@Override
+		public String execute() {
+			messages.addMessage(message);
+			return "";
+		}
+	}
 
-        response.append("Here are all the messages I've received:");
-        messages.iterateMessages((msg, idx) -> response.append("\n " + (idx + 1) + ". " + msg));
+	/** Prints a hello response. */
+	static class HelloCommand extends Command {
+		@Override
+		public String execute() {
+			return "Hello there!";
+		}
+	}
 
-        Ui.printResponse(response.toString());
-        return true;
-    }
+	/** Prints a canned "how are you" response. */
+	static class HowAreYouCommand extends Command {
+		@Override
+		public String execute() {
+			return "I'm just a program, but thanks for asking!";
+		}
+	}
 
-    /**
-     * Prints all tasks and a summary count.
-     *
-     * @return true always
-     */
-    public static boolean listCommand() {
-        StringBuilder response = new StringBuilder();
+	/** Lists all messages recorded. */
+	static class ListMessagesCommand extends Command {
+		@Override
+		public String execute() {
+			StringBuilder response = new StringBuilder();
+			response.append("Here are all the messages I've received:");
+			messages.iterateMessages((msg, idx) -> response.append("\n " + (idx + 1) + ". " + msg));
+			return response.toString();
+		}
+	}
 
-        response.append("Here are all the tasks:");
-        tasklist.iterateTasks((task, index) -> response.append("\n " + (index + 1) + ". " + task));
-        response.append("\nNow you have " + tasklist.size() + " tasks in the list.");
-        Ui.printResponse(response.toString());
-        return true;
-    }
+	/** Lists all tasks with count. */
+	static class ListTasksCommand extends Command {
+		@Override
+		public String execute() {
+			StringBuilder response = new StringBuilder();
+			response.append("Here are all the tasks:");
+			tasklist.iterateTasks(
+					(task, index) -> response.append("\n " + (index + 1) + ". " + task));
+			response.append("\nNow you have " + tasklist.size() + " tasks in the list.");
+			return response.toString();
+		}
+	}
 
-    /**
-     * Marks the given task as done.
-     *
-     * @param taskNumber 1-based index of the task
-     * @return true if marked; false if the index is invalid
-     */
-    public static boolean markCommand(int taskNumber) {
-        StringBuilder response = new StringBuilder();
-        try {
-            int index = taskNumber - 1;
-            tasklist.get(index).markDone();
-            response.append("Task " + taskNumber + " marked as done.\n" + tasklist.get(index));
-        } catch (NumberFormatException | IndexOutOfBoundsException e) {
-            response.append("Invalid task number.");
-            return false;
-        }
-        Ui.printResponse(response.toString());
-        return true;
-    }
+	/** Marks a task as done. */
+	static class MarkCommand extends Command {
+		private final int taskNumber; // 1-based
 
-    /**
-     * Marks the given task as not done.
-     *
-     * @param taskNumber 1-based index of the task
-     * @return true if unmarked; false if the index is invalid
-     */
-    public static boolean unmarkCommand(int taskNumber) {
-        StringBuilder response = new StringBuilder();
-        try {
-            int index = taskNumber - 1;
-            tasklist.get(index).markNotDone();
-            response.append("Task " + taskNumber + " marked as not done.\n" + tasklist.get(index));
-        } catch (NumberFormatException | IndexOutOfBoundsException e) {
-            response.append("Invalid task number.");
-            return false;
-        }
-        Ui.printResponse(response.toString());
-        return true;
-    }
+		MarkCommand(int taskNumber) {
+			this.taskNumber = taskNumber;
+		}
 
-    /**
-     * Deletes the given task.
-     *
-     * @param taskNumber 1-based index of the task
-     * @return true if deleted; false if the index is invalid
-     */
-    public static boolean deleteCommand(int taskNumber) {
-        StringBuilder response = new StringBuilder();
-        try {
-            int index = taskNumber - 1;
-            tasklist.removeTask(index);
-            response.append("Task " + taskNumber + " deleted.");
-        } catch (NumberFormatException | IndexOutOfBoundsException e) {
-            response.append("Invalid task number.");
-            return false;
-        }
-        Ui.printResponse(response.toString());
-        return true;
-    }
+		@Override
+		public String execute() {
+			StringBuilder response = new StringBuilder();
+			try {
+				int index = taskNumber - 1;
+				tasklist.get(index).markDone();
+				response.append("Task " + taskNumber + " marked as done.\n" + tasklist.get(index));
+			} catch (NumberFormatException | IndexOutOfBoundsException e) {
+				return ""; // maintain prior behavior: no output on invalid index
+			}
+			return response.toString();
+		}
+	}
 
-    /**
-     * Parses the message as a task command (todo/deadline/event) and adds it to the
-     * list.
-     *
-     * @param message raw command string
-     * @return true always
-     */
-    public static boolean addTask(String message) {
-        StringBuilder response = new StringBuilder();
+	/** Marks a task as not done. */
+	static class UnmarkCommand extends Command {
+		private final int taskNumber; // 1-based
 
-        Pair<Task, Exception> buildPair = Task.buildTask(message);
-        if (buildPair.getSecond() != null)
-            response.append(buildPair.getSecond().getMessage());
-        else {
-            tasklist.addTask(buildPair.getFirst());
-            response.append("Got it. I've added this task:\n" + buildPair.getFirst());
-            response.append("\nNow you have " + tasklist.size() + " tasks in the list.");
-        }
-        Ui.printResponse(response.toString());
-        return true;
-    }
+		UnmarkCommand(int taskNumber) {
+			this.taskNumber = taskNumber;
+		}
 
-    /**
-     * Persists tasks to disk via {@link Storage}.
-     *
-     * @return true if save succeeded, false otherwise
-     */
-    public static boolean saveCommand() {
-        StringBuilder response = new StringBuilder();
-        boolean flag = Storage.saveTasks(tasklist, response);
-        if (flag) {
-            response.append("Tasks saved successfully.");
-        } else {
-            response.append("Error saving tasks.");
-        }
-        Ui.printResponse(response.toString());
-        return flag;
-    }
+		@Override
+		public String execute() {
+			StringBuilder response = new StringBuilder();
+			try {
+				int index = taskNumber - 1;
+				tasklist.get(index).markNotDone();
+				response.append(
+						"Task " + taskNumber + " marked as not done.\n" + tasklist.get(index));
+			} catch (NumberFormatException | IndexOutOfBoundsException e) {
+				return ""; // maintain prior behavior: no output on invalid index
+			}
+			return response.toString();
+		}
+	}
 
-    /**
-     * Loads tasks from disk via {@link Storage} into the in-memory list.
-     *
-     * @return true if load succeeded, false otherwise
-     */
-    public static boolean loadCommand() {
-        StringBuilder response = new StringBuilder();
-        boolean flag = Storage.loadTasks(tasklist, response);
-        if (flag) {
-            response.append("Tasks loaded successfully.");
-        } else {
-            response.append("Error loading tasks.");
-        }
-        Ui.printResponse(response.toString());
-        return flag;
-    }
+	/** Deletes the specified task. */
+	static class DeleteCommand extends Command {
+		private final int taskNumber; // 1-based
 
-    /**
-     * Checks and lists tasks due strictly before the given date.
-     *
-     * @param message full command string starting with "check due "
-     * @return true if all checks succeed; false on invalid date or parse errors
-     */
-    public static boolean checkDueCommand(String message) {
-        StringBuilder response = new StringBuilder();
-        String time = message.substring(9).trim();
-        String processedTime = Task.printTime(time);
+		DeleteCommand(int taskNumber) {
+			this.taskNumber = taskNumber;
+		}
 
-        if (!Task.checkTimeValid(time)) {
-            response.append("Invalid date format. Please use: " + Task.getInputDtfPattern());
-            Ui.printResponse(response.toString());
-            return false;
-        }
-        response.append("Checking for due tasks on " + processedTime + "...");
+		@Override
+		public String execute() {
+			StringBuilder response = new StringBuilder();
+			try {
+				int index = taskNumber - 1;
+				tasklist.removeTask(index);
+				response.append("Task " + taskNumber + " deleted.");
+			} catch (NumberFormatException | IndexOutOfBoundsException e) {
+				return ""; // maintain prior behavior: no output on invalid index
+			}
+			return response.toString();
+		}
+	}
 
-        ArrayList<Boolean> flags = new ArrayList<>();
-        tasklist.iterateTasks(
-                task -> {
-                    try {
-                        if (task.isDue(time)) {
-                            response.append("\n").append(task.toString());
-                        }
-                    } catch (DateTimeParseException e) {
-                        response.append("\nUnable to check due for task: " + task);
-                        flags.add(false);
-                    }
-                });
+	/** Parses and adds a task. */
+	static class AddTaskCommand extends Command {
+		private final String message;
 
-        Ui.printResponse(response.toString());
-        return flags.stream().allMatch(flag -> flag);
-    }
+		AddTaskCommand(String message) {
+			this.message = message;
+		}
 
-    /** Prints the help text including commands and date formats. */
-    public static void helpCommand() {
-        StringBuilder response = new StringBuilder();
-        response.append("Here are the list of commands! [case-sensitive]\n");
-        response.append("\nhello:\n\tGreet the program! be polite :)");
-        response.append("\nhow are you?:\n\tAsk the program how it is doing");
-        response.append("\nlist messages:\n\tList all messages received");
-        response.append("\nlist:\n\tList all tasks");
-        response.append("\nhelp:\n\tShow this help message");
-        response.append("\ntodo <todo description>: \n\tAdd a Todo Task to task list");
-        response.append(
-                "\n"
-                        + "deadline <deadline description> /by <deadline time>: \n"
-                        + "\tAdd a Deadline Task to task list (format: "
-                        + Task.getInputDtfPattern()
-                        + ")");
-        response.append(
-                "\n"
-                        + "event <event description> /from <start time> /to <end time>: \n"
-                        + "\tAdd an Event Task to task list (format: "
-                        + Task.getInputDtfPattern()
-                        + ")");
-        response.append("\nmark <task number>: \n\tMark a task as done");
-        response.append("\nunmark <task number>: \n\tMark a task as not done");
-        response.append(
-                "\ncheck due <date>: \n\tCheck for tasks that are due before the specified date (format: "
-                        + Task.getInputDtfPattern()
-                        + ")");
-        response.append(
-                "\n"
-                        + "find <substring>: \n"
-                        + "\tFind tasks whose descriptions contain the given text (case-sensitive)");
+		@Override
+		public String execute() {
+			StringBuilder response = new StringBuilder();
+			Pair<Task, Exception> buildPair = Task.buildTask(message);
+			if (buildPair.getSecond() != null) {
+				response.append(buildPair.getSecond().getMessage());
+			} else {
+				tasklist.addTask(buildPair.getFirst());
+				response.append("Got it. I've added this task:\n" + buildPair.getFirst());
+				response.append("\nNow you have " + tasklist.size() + " tasks in the list.");
+			}
+			return response.toString();
+		}
+	}
 
-        Ui.printResponse(response.toString());
-    }
+	/** Saves tasks to storage. */
+	static class SaveCommand extends Command {
+		@Override
+		public String execute() {
+			StringBuilder response = new StringBuilder();
+			boolean flag = Storage.saveTasks(tasklist, response);
+			if (flag) {
+				response.append("Tasks saved successfully.");
+			} else {
+				response.append("Error saving tasks.");
+			}
+			return response.toString();
+		}
+	}
 
-    /**
-     * Prints a fallback message for unrecognised commands along with the first
-     * token and echo.
-     *
-     * @param command the unrecognised input
-     */
-    public static void unknownCommand(String command) {
-        Ui.printResponse(
-                "Unrecognised command: \"" + command.split(" ")[0] + "\" Parrotting...\n" + command);
-    }
+	/** Loads tasks from storage. */
+	static class LoadCommand extends Command {
+		@Override
+		public String execute() {
+			StringBuilder response = new StringBuilder();
+			boolean flag = Storage.loadTasks(tasklist, response);
+			if (flag) {
+				response.append("Tasks loaded successfully.");
+			} else {
+				response.append("Error loading tasks.");
+			}
+			return response.toString();
+		}
+	}
 
-    /**
-     * Finds tasks whose descriptions contain the given substring and prints the
-     * matching tasks in a
-     * numbered list. Matching is case-sensitive. If there are no matches, prints a
-     * suitable message.
-     *
-     * @param string substring to search for within task descriptions
-     */
-    public static void findCommand(String string) {
-        StringBuilder response = new StringBuilder();
-        ArrayList<Task> matches = new ArrayList<>();
+	/** Checks due tasks before a specified date. */
+	static class CheckDueCommand extends Command {
+		private final String message; // full command string: "check due <date>"
 
-        tasklist.iterateTasks(
-                task -> {
-                    if (task.checkDescriptionContains(string)) {
-                        matches.add(task);
-                    }
-                });
+		CheckDueCommand(String message) {
+			this.message = message;
+		}
 
-        if (matches.isEmpty()) {
-            response.append("No tasks found matching: \"" + string + "\"");
-        } else {
-            response.append("Found the following tasks matching: \"" + string);
-            int num = 0;
-            for (Task task : matches) {
-                response.append("\n" + ++num + ") " + task.toString());
-            }
-        }
+		@Override
+		public String execute() {
+			StringBuilder response = new StringBuilder();
+			String time = message.substring(9).trim();
+			String processedTime = Task.printTime(time);
 
-        Ui.printResponse(response.toString());
-    }
+			if (!Task.checkTimeValid(time)) {
+				response.append("Invalid date format. Please use: " + Task.getInputDtfPattern());
+				return response.toString();
+			}
+
+			// Tests expect this preface line
+			response.append("Checking for due tasks on ").append(processedTime).append("...");
+
+			tasklist.iterateTasks(
+					task -> {
+						try {
+							if (task.isDue(time)) {
+								response.append("\n").append(task.toString());
+							}
+						} catch (DateTimeParseException e) {
+							response.append("\nUnable to check due for task: " + task);
+						}
+					});
+			// Keep additional summary header if there are due tasks; otherwise print a
+			// clear none
+			// message
+			if (response.toString().lines().count() == 1) { // only the preface line
+				response.append("\nNo tasks are due before ").append(processedTime).append(".");
+			} else {
+				response.append("\n");
+			}
+
+			return response.toString();
+		}
+	}
+
+	/** Prints help text. */
+	static class HelpCommand extends Command {
+		@Override
+		public String execute() {
+			StringBuilder response = new StringBuilder();
+			response.append("Here are the list of commands! [case-sensitive]\n");
+			response.append("\nhello:\n\tGreet the program! be polite :)");
+			response.append("\nhow are you?:\n\tAsk the program how it is doing");
+			response.append("\nlist messages:\n\tList all messages received");
+			response.append("\nlist:\n\tList all tasks");
+			response.append("\nhelp:\n\tShow this help message");
+			response.append("\ntodo <todo description>: \n\tAdd a Todo Task to task list");
+			response.append(
+					"\n"
+							+ "deadline <deadline description> /by <deadline time>: \n"
+							+ "\tAdd a Deadline Task to task list (format: "
+							+ Task.getInputDtfPattern()
+							+ ")");
+			response.append(
+					"\n"
+							+ "event <event description> /from <start time> /to <end time>: \n"
+							+ "\tAdd an Event Task to task list (format: "
+							+ Task.getInputDtfPattern()
+							+ ")");
+			response.append("\nmark <task number>: \n\tMark a task as done");
+			response.append("\nunmark <task number>: \n\tMark a task as not done");
+			response.append(
+					"\n"
+							+ "check due <date>: \n"
+							+ "\tCheck for tasks that are due before the specified date (format: "
+							+ Task.getInputDtfPattern()
+							+ ")");
+			response.append(
+					"\n"
+							+ "find <substring>: \n"
+							+ "\tFind tasks whose descriptions contain the given text"
+							+ " (case-sensitive)");
+
+			return response.toString();
+		}
+	}
+
+	/** Prints an unknown command message. */
+	static class UnknownCommand extends Command {
+		private final String command;
+
+		UnknownCommand(String command) {
+			this.command = command;
+		}
+
+		@Override
+		public String execute() {
+			return "Unrecognised command: \""
+					+ command.split(" ")[0]
+					+ "\" Parrotting...\n"
+					+ command;
+		}
+	}
+
+	/** Finds tasks containing a substring (case-sensitive). */
+	static class FindCommand extends Command {
+		private final String needle;
+
+		FindCommand(String needle) {
+			this.needle = needle;
+		}
+
+		@Override
+		public String execute() {
+			StringBuilder response = new StringBuilder();
+			ArrayList<Task> matches = new ArrayList<>();
+
+			tasklist.iterateTasks(
+					task -> {
+						if (task.checkDescriptionContains(needle)) {
+							matches.add(task);
+						}
+					});
+
+			if (matches.isEmpty()) {
+				response.append("No tasks found matching: \"" + needle + "\"");
+			} else {
+				response.append("Found the following tasks matching: \"" + needle);
+				int num = 0;
+				for (Task task : matches) {
+					response.append("\n" + ++num + ") " + task.toString());
+				}
+			}
+
+			return response.toString();
+		}
+	}
 }

@@ -20,6 +20,21 @@ java {
 dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.0'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.0'
+
+    String javaFxVersion = '17.0.7'
+
+    implementation group: 'org.openjfx', name: 'javafx-base', version: javaFxVersion, classifier: 'win'
+    implementation group: 'org.openjfx', name: 'javafx-base', version: javaFxVersion, classifier: 'mac'
+    implementation group: 'org.openjfx', name: 'javafx-base', version: javaFxVersion, classifier: 'linux'
+    implementation group: 'org.openjfx', name: 'javafx-controls', version: javaFxVersion, classifier: 'win'
+    implementation group: 'org.openjfx', name: 'javafx-controls', version: javaFxVersion, classifier: 'mac'
+    implementation group: 'org.openjfx', name: 'javafx-controls', version: javaFxVersion, classifier: 'linux'
+    implementation group: 'org.openjfx', name: 'javafx-fxml', version: javaFxVersion, classifier: 'win'
+    implementation group: 'org.openjfx', name: 'javafx-fxml', version: javaFxVersion, classifier: 'mac'
+    implementation group: 'org.openjfx', name: 'javafx-fxml', version: javaFxVersion, classifier: 'linux'
+    implementation group: 'org.openjfx', name: 'javafx-graphics', version: javaFxVersion, classifier: 'win'
+    implementation group: 'org.openjfx', name: 'javafx-graphics', version: javaFxVersion, classifier: 'mac'
+    implementation group: 'org.openjfx', name: 'javafx-graphics', version: javaFxVersion, classifier: 'linux'
 }
 
 test {
@@ -38,26 +53,36 @@ test {
 
 application {
     // Point to the actual entrypoint with a main method
-    mainClass.set("meep.ui.Meep")
+    mainClass.set("meep.gui.Launcher")
 }
 
 shadowJar {
-    archiveBaseName = "duke"
+    archiveBaseName = "meep"
     archiveClassifier = null
 }
 
-run{
+run {
+    standardInput = System.in
+}
+
+// Optional: run the CLI explicitly (useful in headless environments)
+tasks.register('runCli', JavaExec) {
+    group = 'application'
+    description = 'Run the Meep CLI (headless-friendly)'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'meep.ui.Meep'
     standardInput = System.in
 }
 
 spotless {
     java {
         target 'src/**/*.java'
-    importOrder()
-    googleJavaFormat('1.19.2').reflowLongStrings()
+        importOrder()
+        googleJavaFormat('1.19.2').aosp().reflowLongStrings()
+        eclipse().configFile('config/spotless/eclipse-java-formatter.xml')
         trimTrailingWhitespace()
         endWithNewline()
-        indentWithSpaces(4)
+        indentWithTabs(4)
     }
 }
 
@@ -80,4 +105,12 @@ tasks.withType(Checkstyle).configureEach {
 // Enforce formatting on CI via the standard 'check' lifecycle
 tasks.named('check') {
     dependsOn 'spotlessCheck', 'checkstyleMain', 'checkstyleTest'
+}
+
+tasks.register('compileRun') {
+    dependsOn 'spotlessApply', 'check', 'clean', 'build', 'run'
+}
+
+tasks.register('buildRun') {
+    dependsOn 'spotlessApply', 'build', 'run'
 }
