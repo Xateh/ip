@@ -45,6 +45,10 @@ public class MainWindow extends AnchorPane {
 	private void handleUserInput() {
 		String input = userInput.getText();
 		Pair<String, String> response = meep.getResponse(input);
+		// If this was the help command, use the bot's help text to populate the GUI
+		if ("HelpCommand".equals(response.getSecond())) {
+			new HelpWindow(response.getFirst()).show();
+		}
 		dialogContainer
 				.getChildren()
 				.addAll(

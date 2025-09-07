@@ -28,7 +28,8 @@ public abstract class Command {
 		/**
 		 * Creates a command that records a raw input message.
 		 *
-		 * @param message the input text to record
+		 * @param message
+		 *            the input text to record
 		 */
 		AddMessageCommand(String message) {
 			assert message != null : "message must not be null";
@@ -81,8 +82,7 @@ public abstract class Command {
 		public String execute() {
 			StringBuilder response = new StringBuilder();
 			response.append("Here are all the tasks:");
-			TASKS.iterateTasks(
-					(task, index) -> response.append("\n " + (index + 1) + ". " + task));
+			TASKS.iterateTasks((task, index) -> response.append("\n " + (index + 1) + ". " + task));
 			response.append("\nNow you have " + TASKS.size() + " tasks in the list.");
 			return response.toString();
 		}
@@ -95,7 +95,8 @@ public abstract class Command {
 		/**
 		 * Creates a command to mark a task as done.
 		 *
-		 * @param taskNumber 1-based task number to mark
+		 * @param taskNumber
+		 *            1-based task number to mark
 		 */
 		MarkCommand(int taskNumber) {
 			this.taskNumber = taskNumber;
@@ -123,7 +124,8 @@ public abstract class Command {
 		/**
 		 * Creates a command to mark a task as not done.
 		 *
-		 * @param taskNumber 1-based task number to unmark
+		 * @param taskNumber
+		 *            1-based task number to unmark
 		 */
 		UnmarkCommand(int taskNumber) {
 			this.taskNumber = taskNumber;
@@ -136,8 +138,7 @@ public abstract class Command {
 			try {
 				int index = taskNumber - 1;
 				TASKS.get(index).markNotDone();
-				response.append(
-						"Task " + taskNumber + " marked as not done.\n" + TASKS.get(index));
+				response.append("Task " + taskNumber + " marked as not done.\n" + TASKS.get(index));
 			} catch (NumberFormatException | IndexOutOfBoundsException e) {
 				return ""; // maintain prior behavior: no output on invalid index
 			}
@@ -152,7 +153,8 @@ public abstract class Command {
 		/**
 		 * Creates a command to delete a task.
 		 *
-		 * @param taskNumber 1-based task number to delete
+		 * @param taskNumber
+		 *            1-based task number to delete
 		 */
 		DeleteCommand(int taskNumber) {
 			this.taskNumber = taskNumber;
@@ -180,8 +182,9 @@ public abstract class Command {
 		/**
 		 * Creates a command to parse and add a task from the raw command string.
 		 *
-		 * @param message the full task command (e.g., "todo ...", "deadline ...",
-		 *                "event ...")
+		 * @param message
+		 *            the full task command (e.g., "todo ...", "deadline ...", "event
+		 *            ...")
 		 */
 		AddTaskCommand(String message) {
 			assert message != null && !message.trim().isEmpty()
@@ -244,7 +247,8 @@ public abstract class Command {
 		/**
 		 * Creates a command to check tasks due before a given date.
 		 *
-		 * @param message full command string in the form "check due <date>"
+		 * @param message
+		 *            full command string in the form "check due <date>"
 		 */
 		CheckDueCommand(String message) {
 			assert message != null && message.startsWith("check due")
@@ -340,7 +344,8 @@ public abstract class Command {
 		/**
 		 * Creates a command that reports an unrecognised input.
 		 *
-		 * @param command the full raw input
+		 * @param command
+		 *            the full raw input
 		 */
 		UnknownCommand(String command) {
 			assert command != null : "raw command must not be null";
@@ -364,7 +369,8 @@ public abstract class Command {
 		/**
 		 * Creates a command to find tasks with descriptions containing a substring.
 		 *
-		 * @param needle the case-sensitive search substring
+		 * @param needle
+		 *            the case-sensitive search substring
 		 */
 		FindCommand(String needle) {
 			assert needle != null : "search needle must not be null";
@@ -376,9 +382,7 @@ public abstract class Command {
 		public String execute() {
 			StringBuilder response = new StringBuilder();
 			List<Task> matches =
-					TASKS.stream()
-							.filter(task -> task.checkDescriptionContains(needle))
-							.toList();
+					TASKS.stream().filter(task -> task.checkDescriptionContains(needle)).toList();
 
 			if (matches.isEmpty()) {
 				response.append("No tasks found matching: \"").append(needle).append("\"");
@@ -386,9 +390,14 @@ public abstract class Command {
 				response.append("Found the following tasks matching: \"")
 						.append(needle)
 						.append("\"");
-				matches.stream().forEach(task -> {
-					response.append("\n").append(matches.indexOf(task) + 1).append(") ").append(task);
-				});
+				matches.stream()
+						.forEach(
+								task -> {
+									response.append("\n")
+											.append(matches.indexOf(task) + 1)
+											.append(") ")
+											.append(task);
+								});
 			}
 
 			return response.toString();

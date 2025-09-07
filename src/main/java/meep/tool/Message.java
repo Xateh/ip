@@ -6,7 +6,8 @@ import java.time.format.DateTimeFormatter;
 /**
  * Immutable user message with a creation timestamp.
  *
- * <p>Captures message text and time of creation. The text must be non-null.
+ * <p>
+ * Captures message text and time of creation. The text must be non-null.
  */
 class Message {
 	private final String message;

@@ -6,8 +6,9 @@ import meep.ui.Ui;
 /**
  * Routes raw user input to specific command handlers in {@link Command}.
  *
- * <p>Interactive mode prints responses and certain error messages; quiet mode
- * only builds commands without printing.
+ * <p>
+ * Interactive mode prints responses and certain error messages; quiet mode only
+ * builds commands without printing.
  */
 public class Parser {
 	/**
@@ -15,7 +16,8 @@ public class Parser {
 	 * non-empty response via {@link Ui#printResponse(String)}. This method also
 	 * records the message.
 	 *
-	 * @param message user input
+	 * @param message
+	 *            user input
 	 */
 	public static Command parse(String message) {
 		assert message != null : "input message must not be null";
@@ -31,7 +33,10 @@ public class Parser {
 		return command;
 	}
 
-	/** Parses a command without executing or printing any response; still records the message. */
+	/**
+	 * Parses a command without executing or printing any response; still records
+	 * the message.
+	 */
 	public static Command parseQuiet(String message) {
 		assert message != null : "input message must not be null";
 		// record message silently

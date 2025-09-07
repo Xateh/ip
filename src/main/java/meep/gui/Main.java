@@ -11,12 +11,13 @@ import meep.ui.Meep;
 /**
  * JavaFX entry-point for Meep using FXML layouts.
  *
- * <p>Loads the main window from FXML and wires the controller with a Meep
+ * <p>
+ * Loads the main window from FXML and wires the controller with a Meep
  * instance.
  */
 public class Main extends Application {
 
-	private Meep duke = new Meep();
+	private Meep meep = new Meep();
 
 	@Override
 	public void start(Stage stage) {
@@ -29,7 +30,7 @@ public class Main extends Application {
 			Scene scene = new Scene(ap);
 
 			stage.setScene(scene);
-			fxmlLoader.<MainWindow>getController().setMeep(duke); // inject the Meep instance
+			fxmlLoader.<MainWindow>getController().setMeep(meep); // inject the Meep instance
 			stage.show();
 		} catch (IOException e) {
 			e.printStackTrace();

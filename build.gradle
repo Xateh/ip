@@ -63,6 +63,7 @@ shadowJar {
 
 run {
     standardInput = System.in
+    enableAssertions = true
 }
 
 // Optional: run the CLI explicitly (useful in headless environments)
