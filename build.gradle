@@ -110,3 +110,7 @@ tasks.named('check') {
 tasks.register('compileRun') {
     dependsOn 'spotlessApply', 'check', 'clean', 'build', 'run'
 }
+
+tasks.register('buildRun') {
+    dependsOn 'spotlessApply', 'build', 'run'
+}

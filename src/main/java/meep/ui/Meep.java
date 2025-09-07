@@ -1,5 +1,7 @@
 package meep.ui;
 
+import meep.tool.Command;
+import meep.tool.Pair;
 import meep.tool.Parser;
 
 /**
@@ -19,16 +21,25 @@ public class Meep {
 		String message = "";
 		message = Ui.readCommand();
 		while (!message.equals("bye")) {
-			Parser.parse(message);
+			Command c = Parser.parse(message);
+			if (c != null) {
+				String response = c.execute();
+				if (response != null && !response.isEmpty()) {
+					Ui.printResponse(response);
+				}
+			}
 			message = Ui.readCommand();
 		}
 		Ui.printResponse("Bye. Hope to see you again soon!");
 	}
 
-	/**
-     * Generates a response for the user's chat message.
-     */
-	public String getResponse(String input) {
-		return "Meep! I heard you say: " + input;
+	/** Generates a response for the user's chat message. */
+	public Pair<String, String> getResponse(String input) {
+		try {
+			Command c = Parser.parseQuiet(input);
+			return new Pair<>(c.execute(), c.getClass().getSimpleName());
+		} catch (Exception e) {
+			return new Pair<>("Error: " + e.getMessage(), "Error");
+		}
 	}
 }

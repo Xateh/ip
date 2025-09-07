@@ -10,11 +10,11 @@ import java.util.Objects;
  * @param <S>
  *            second type
  */
-final class Pair<F, S> {
+public final class Pair<F, S> {
 	private final F first;
 	private final S second;
 
-	Pair(F first, S second) {
+	public Pair(F first, S second) {
 		this.first = first;
 		this.second = second;
 	}

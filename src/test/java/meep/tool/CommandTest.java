@@ -27,8 +27,8 @@ class CommandTest {
 
 	@Test
 	void helloAndHowAreYouPrint() {
-		assertTrue(Command.helloCommand());
-		assertTrue(Command.howAreYouCommand());
+		Parser.parse("hello");
+		Parser.parse("how are you?");
 		String s = out.toString();
 		assertTrue(s.contains("Hello there!"));
 		assertTrue(s.contains("I'm just a program, but thanks for asking!"));
@@ -36,11 +36,11 @@ class CommandTest {
 
 	@Test
 	void listAndAddTaskAndMarkFlow() {
-		assertTrue(Command.addTask("todo x"));
-		assertTrue(Command.listCommand());
-		assertTrue(Command.markCommand(1));
-		assertTrue(Command.unmarkCommand(1));
-		assertTrue(Command.deleteCommand(1));
+		Parser.parse("todo x");
+		Parser.parse("list");
+		Parser.parse("mark 1");
+		Parser.parse("unmark 1");
+		Parser.parse("delete 1");
 		String s = out.toString();
 		assertTrue(s.contains("Got it. I've added this task:"));
 		assertTrue(s.contains("Here are all the tasks:"));
@@ -51,8 +51,8 @@ class CommandTest {
 
 	@Test
 	void helpAndUnknown() {
-		Command.helpCommand();
-		Command.unknownCommand("noop");
+		Parser.parse("help");
+		Parser.parse("noop");
 		String s = out.toString();
 		assertTrue(s.contains("Here are the list of commands! [case-sensitive]"));
 		assertTrue(s.contains("Unrecognised command: \"noop\""));
@@ -61,14 +61,13 @@ class CommandTest {
 	@Test
 	void invalidIndicesReturnFalseAndPrintMessage() {
 		out.reset();
-		assertFalse(Command.markCommand(0));
-		// Command returns false early without printing on invalid indices
+		Parser.parse("mark 0");
 		assertEquals("", out.toString());
 		out.reset();
-		assertFalse(Command.unmarkCommand(-1));
+		Parser.parse("unmark -1");
 		assertEquals("", out.toString());
 		out.reset();
-		assertFalse(Command.deleteCommand(9999));
+		Parser.parse("delete 9999");
 		assertEquals("", out.toString());
 	}
 
@@ -77,7 +76,7 @@ class CommandTest {
 		out.reset();
 		Parser.parse("test-msg-A");
 		Parser.parse("test-msg-B");
-		Command.listMessageCommand();
+		Parser.parse("list messages");
 		String s = out.toString();
 		assertTrue(s.contains("test-msg-A"));
 		assertTrue(s.contains("test-msg-B"));
@@ -87,16 +86,16 @@ class CommandTest {
 	void checkDueBoundariesForDeadlineAndEvent() {
 		out.reset();
 		// Create three tasks around the boundary date 2025-12-31
-		Command.addTask("deadline DUE_BEFORE /by 2025-12-30");
-		Command.addTask("deadline DUE_EQUAL /by 2025-12-31");
-		Command.addTask("deadline DUE_AFTER /by 2026-01-01");
-		Command.addTask("event E_BEFORE /from 2025-12-01 /to 2025-12-30");
-		Command.addTask("event E_EQUAL /from 2025-12-01 /to 2025-12-31");
-		Command.addTask("event E_AFTER /from 2025-12-31 /to 2026-01-02");
+		Parser.parse("deadline DUE_BEFORE /by 2025-12-30");
+		Parser.parse("deadline DUE_EQUAL /by 2025-12-31");
+		Parser.parse("deadline DUE_AFTER /by 2026-01-01");
+		Parser.parse("event E_BEFORE /from 2025-12-01 /to 2025-12-30");
+		Parser.parse("event E_EQUAL /from 2025-12-01 /to 2025-12-31");
+		Parser.parse("event E_AFTER /from 2025-12-31 /to 2026-01-02");
 
 		// Only those strictly before should be due (since isDue uses isAfter)
 		out.reset();
-		assertTrue(Command.checkDueCommand("check due 2025-12-31"));
+		Parser.parse("check due 2025-12-31");
 		String s = out.toString();
 		assertTrue(s.contains("DUE_BEFORE"));
 		assertFalse(s.contains("DUE_EQUAL"));
@@ -110,7 +109,7 @@ class CommandTest {
 	@Test
 	void helpContainsAllCommandsAndPatterns() {
 		out.reset();
-		Command.helpCommand();
+		Parser.parse("help");
 		String s = out.toString();
 		assertTrue(s.contains("hello:"));
 		assertTrue(s.contains("how are you?:"));

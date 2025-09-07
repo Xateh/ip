@@ -27,19 +27,19 @@ class FindCommandTest {
 	@Test
 	void findListsMatchesOrNone() {
 		// prepare some tasks
-		Command.addTask("todo Alpha");
-		Command.addTask("deadline Beta /by 2025-12-31");
-		Command.addTask("event Gamma /from 2025-12-30 /to 2026-01-02");
+		Parser.parse("todo Alpha");
+		Parser.parse("deadline Beta /by 2025-12-31");
+		Parser.parse("event Gamma /from 2025-12-30 /to 2026-01-02");
 
 		out.reset();
-		Command.findCommand("a"); // case-sensitive: matches Alpha and Gamma
+		Parser.parse("find a"); // case-sensitive: matches Alpha and Gamma
 		String s = out.toString();
 		assertTrue(s.contains("Found the following tasks matching: \"a"));
 		assertTrue(s.contains("Alpha"));
 		assertTrue(s.contains("Gamma"));
 
 		out.reset();
-		Command.findCommand("zzz");
+		Parser.parse("find zzz");
 		String s2 = out.toString();
 		assertTrue(s2.contains("No tasks found matching: \"zzz\""));
 		assertFalse(s2.contains("1) "));
