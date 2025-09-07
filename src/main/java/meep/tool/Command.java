@@ -1,16 +1,19 @@
 package meep.tool;
 
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Central command handler for Meep. Implements the Command pattern where each
- * concrete operation is a subclass overriding {@link #execute()}.
+ * Central command handler for Meep.
+ *
+ * <p>
+ * Implements the Command pattern where each concrete operation is a nested
+ * subclass overriding {@link #execute()}.
  */
 public abstract class Command {
 	// Shared application state for all commands
-	protected static MessageList messages = new MessageList();
-	protected static TaskList tasklist = new TaskList();
+	protected static final MessageList messages = new MessageList();
+	protected static final TaskList tasklist = new TaskList();
 
 	/**
 	 * Executes the command and returns the response text. Return an empty string if
@@ -23,6 +26,7 @@ public abstract class Command {
 		private final String message;
 
 		AddMessageCommand(String message) {
+			assert message != null : "message must not be null";
 			this.message = message;
 		}
 
@@ -145,6 +149,8 @@ public abstract class Command {
 		private final String message;
 
 		AddTaskCommand(String message) {
+			assert message != null && !message.trim().isEmpty()
+					: "task command must not be null or empty";
 			this.message = message;
 		}
 
@@ -198,6 +204,8 @@ public abstract class Command {
 		private final String message; // full command string: "check due <date>"
 
 		CheckDueCommand(String message) {
+			assert message != null && message.startsWith("check due")
+					: "expected 'check due <date>'";
 			this.message = message;
 		}
 
@@ -238,7 +246,7 @@ public abstract class Command {
 		}
 	}
 
-	/** Prints help text. */
+	/** Prints help text listing commands and usage patterns. */
 	static class HelpCommand extends Command {
 		@Override
 		public String execute() {
@@ -280,7 +288,7 @@ public abstract class Command {
 		}
 	}
 
-	/** Prints an unknown command message. */
+	/** Prints an unknown command message with the unrecognized keyword and echo. */
 	static class UnknownCommand extends Command {
 		private final String command;
 
@@ -292,7 +300,7 @@ public abstract class Command {
 		public String execute() {
 			return "Unrecognised command: \""
 					+ command.split(" ")[0]
-					+ "\" Parrotting...\n"
+					+ "\" Parroting...\n"
 					+ command;
 		}
 	}
@@ -308,22 +316,19 @@ public abstract class Command {
 		@Override
 		public String execute() {
 			StringBuilder response = new StringBuilder();
-			ArrayList<Task> matches = new ArrayList<>();
-
-			tasklist.iterateTasks(
-					task -> {
-						if (task.checkDescriptionContains(needle)) {
-							matches.add(task);
-						}
-					});
+			List<Task> matches =
+					tasklist.stream()
+							.filter(task -> task.checkDescriptionContains(needle))
+							.toList();
 
 			if (matches.isEmpty()) {
-				response.append("No tasks found matching: \"" + needle + "\"");
+				response.append("No tasks found matching: \"").append(needle).append("\"");
 			} else {
-				response.append("Found the following tasks matching: \"" + needle);
-				int num = 0;
-				for (Task task : matches) {
-					response.append("\n" + ++num + ") " + task.toString());
+				response.append("Found the following tasks matching: \"")
+						.append(needle)
+						.append("\"");
+				for (int i = 0; i < matches.size(); i++) {
+					response.append("\n").append(i + 1).append(") ").append(matches.get(i));
 				}
 			}
 

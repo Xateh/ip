@@ -1,6 +1,8 @@
 package meep.tool;
 
 import java.util.ArrayList;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * In-memory list of {@link Message} with simple operations and iteration
@@ -69,9 +71,7 @@ class MessageList {
 	 *            callback invoked for each message
 	 */
 	public void iterateMessages(MessageAction action) {
-		for (Message message : messages) {
-			action.apply(message);
-		}
+		messages.forEach(action::apply);
 	}
 
 	/**
@@ -81,9 +81,16 @@ class MessageList {
 	 *            callback invoked for each (message, index)
 	 */
 	public void iterateMessages(IndexMessageAction action) {
-		for (int i = 0; i < messages.size(); i++) {
-			action.apply(messages.get(i), i);
-		}
+		IntStream.range(0, messages.size()).forEach(i -> action.apply(messages.get(i), i));
+	}
+
+	/**
+	 * Returns a sequential stream over the messages.
+	 *
+	 * @return stream of messages
+	 */
+	public Stream<Message> stream() {
+		return messages.stream();
 	}
 
 	@FunctionalInterface
