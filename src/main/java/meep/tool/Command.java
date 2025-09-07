@@ -1,12 +1,13 @@
 package meep.tool;
 
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Central command handler for Meep.
  *
- * <p>Implements the Command pattern where each concrete operation is a nested
+ * <p>
+ * Implements the Command pattern where each concrete operation is a nested
  * subclass overriding {@link #execute()}.
  */
 public abstract class Command {
@@ -30,6 +31,7 @@ public abstract class Command {
 		 * @param message the input text to record
 		 */
 		AddMessageCommand(String message) {
+			assert message != null : "message must not be null";
 			assert message != null : "message must not be null";
 			this.message = message;
 		}
@@ -373,25 +375,20 @@ public abstract class Command {
 		@Override
 		public String execute() {
 			StringBuilder response = new StringBuilder();
-			ArrayList<Task> matches = new ArrayList<>();
-
-			TASKS.iterateTasks(
-					task -> {
-						if (task.checkDescriptionContains(needle)) {
-							matches.add(task);
-						}
-					});
+			List<Task> matches =
+					TASKS.stream()
+							.filter(task -> task.checkDescriptionContains(needle))
+							.toList();
 
 			if (matches.isEmpty()) {
-				response.append("No tasks found matching: \"" + needle + "\"");
+				response.append("No tasks found matching: \"").append(needle).append("\"");
 			} else {
 				response.append("Found the following tasks matching: \"")
 						.append(needle)
 						.append("\"");
-				int num = 0;
-				for (Task task : matches) {
-					response.append("\n" + ++num + ") " + task.toString());
-				}
+				matches.stream().forEach(task -> {
+					response.append("\n").append(matches.indexOf(task) + 1).append(") ").append(task);
+				});
 			}
 
 			return response.toString();

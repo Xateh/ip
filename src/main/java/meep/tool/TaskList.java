@@ -1,6 +1,8 @@
 package meep.tool;
 
 import java.util.ArrayList;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Mutable collection of {@link Task} items with add/remove/access operations
@@ -67,9 +69,7 @@ class TaskList {
 	 */
 	public void iterateTasks(TaskAction action) {
 		assert action != null : "action must not be null";
-		for (Task task : tasks) {
-			action.apply(task);
-		}
+		tasks.forEach(action::apply);
 	}
 
 	/**
@@ -80,9 +80,16 @@ class TaskList {
 	 */
 	public void iterateTasks(IndexTaskAction action) {
 		assert action != null : "action must not be null";
-		for (int i = 0; i < tasks.size(); i++) {
-			action.apply(tasks.get(i), i);
-		}
+		IntStream.range(0, tasks.size()).forEach(i -> action.apply(tasks.get(i), i));
+	}
+
+	/**
+	 * Returns a sequential stream of tasks.
+	 *
+	 * @return stream over tasks
+	 */
+	public Stream<Task> stream() {
+		return tasks.stream();
 	}
 
 	@FunctionalInterface

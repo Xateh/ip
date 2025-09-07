@@ -1,6 +1,8 @@
 package meep.tool;
 
 import java.util.ArrayList;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * In-memory list of {@link Message} with add/remove/access operations and
@@ -68,9 +70,7 @@ class MessageList {
 	 */
 	public void iterateMessages(MessageAction action) {
 		assert action != null : "action must not be null";
-		for (Message message : messages) {
-			action.apply(message);
-		}
+		messages.forEach(action::apply);
 	}
 
 	/**
@@ -80,9 +80,16 @@ class MessageList {
 	 */
 	public void iterateMessages(IndexMessageAction action) {
 		assert action != null : "action must not be null";
-		for (int i = 0; i < messages.size(); i++) {
-			action.apply(messages.get(i), i);
-		}
+		IntStream.range(0, messages.size()).forEach(i -> action.apply(messages.get(i), i));
+	}
+
+	/**
+	 * Returns a sequential stream over the messages.
+	 *
+	 * @return stream of messages
+	 */
+	public Stream<Message> stream() {
+		return messages.stream();
 	}
 
 	@FunctionalInterface
