@@ -6,8 +6,10 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 /**
- * Abstract base for tasks with Todo, Deadline and Event variants. Provides
- * parsing helpers, serialization, and due-date checks.
+ * Abstract base for tasks with Todo, Deadline and Event variants.
+ *
+ * <p>
+ * Provides parsing helpers, serialization/deserialization, and due-date checks.
  */
 public abstract class Task {
 	private static String inputDtfPattern = "yyyy-MM-dd";

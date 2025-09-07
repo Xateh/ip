@@ -2,7 +2,13 @@ package meep.tool;
 
 import java.util.ArrayList;
 
-/** Mutable collection of {@link Task} items with simple iteration helpers. */
+/**
+ * Mutable collection of {@link Task} items with simple iteration helpers.
+ *
+ * <p>
+ * Encapsulates a backing {@link java.util.ArrayList} and exposes add/remove,
+ * random access, size queries, and functional iteration utilities.
+ */
 class TaskList {
 	private final ArrayList<Task> tasks;
 

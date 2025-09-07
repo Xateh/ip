@@ -5,9 +5,13 @@ import java.util.ArrayList;
 /**
  * In-memory list of {@link Message} with simple operations and iteration
  * helpers.
+ *
+ * <p>
+ * Provides minimal add/remove/access operations and simple functional iteration
+ * methods for convenience.
  */
 class MessageList {
-	private ArrayList<Message> messages = new ArrayList<>();
+	private final ArrayList<Message> messages = new ArrayList<>();
 
 	/**
 	 * Adds a message by content, creating a {@link Message} with current timestamp.
@@ -17,6 +21,7 @@ class MessageList {
 	 * @return the string representation of the added message
 	 */
 	public String addMessage(String message) {
+		assert message != null : "message must not be null";
 		return addMessage(new Message(message));
 	}
 
@@ -28,6 +33,7 @@ class MessageList {
 	 * @return the string representation of the added message
 	 */
 	public String addMessage(Message message) {
+		assert message != null : "message must not be null";
 		messages.add(message);
 		return message.toString();
 	}
@@ -69,6 +75,7 @@ class MessageList {
 	 *            callback invoked for each message
 	 */
 	public void iterateMessages(MessageAction action) {
+		assert action != null : "action must not be null";
 		for (Message message : messages) {
 			action.apply(message);
 		}
@@ -81,6 +88,7 @@ class MessageList {
 	 *            callback invoked for each (message, index)
 	 */
 	public void iterateMessages(IndexMessageAction action) {
+		assert action != null : "action must not be null";
 		for (int i = 0; i < messages.size(); i++) {
 			action.apply(messages.get(i), i);
 		}

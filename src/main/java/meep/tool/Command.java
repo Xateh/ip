@@ -4,13 +4,16 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 /**
- * Central command handler for Meep. Implements the Command pattern where each
- * concrete operation is a subclass overriding {@link #execute()}.
+ * Central command handler for Meep.
+ *
+ * <p>
+ * Implements the Command pattern where each concrete operation is a nested
+ * subclass overriding {@link #execute()}.
  */
 public abstract class Command {
 	// Shared application state for all commands
-	protected static MessageList messages = new MessageList();
-	protected static TaskList tasklist = new TaskList();
+	protected static final MessageList messages = new MessageList();
+	protected static final TaskList tasklist = new TaskList();
 
 	/**
 	 * Executes the command and returns the response text. Return an empty string if
@@ -238,7 +241,7 @@ public abstract class Command {
 		}
 	}
 
-	/** Prints help text. */
+	/** Prints help text listing commands and usage patterns. */
 	static class HelpCommand extends Command {
 		@Override
 		public String execute() {
@@ -280,7 +283,7 @@ public abstract class Command {
 		}
 	}
 
-	/** Prints an unknown command message. */
+	/** Prints an unknown command message with the unrecognized keyword and echo. */
 	static class UnknownCommand extends Command {
 		private final String command;
 
@@ -292,7 +295,7 @@ public abstract class Command {
 		public String execute() {
 			return "Unrecognised command: \""
 					+ command.split(" ")[0]
-					+ "\" Parrotting...\n"
+					+ "\" Parroting...\n"
 					+ command;
 		}
 	}
@@ -320,7 +323,9 @@ public abstract class Command {
 			if (matches.isEmpty()) {
 				response.append("No tasks found matching: \"" + needle + "\"");
 			} else {
-				response.append("Found the following tasks matching: \"" + needle);
+				response.append("Found the following tasks matching: \"")
+						.append(needle)
+						.append("\"");
 				int num = 0;
 				for (Task task : matches) {
 					response.append("\n" + ++num + ") " + task.toString());
