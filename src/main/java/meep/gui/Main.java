@@ -31,7 +31,9 @@ public class Main extends Application {
 
 			stage.setScene(scene);
 			stage.setTitle("Meep");
-			fxmlLoader.<MainWindow>getController().setMeep(meep); // inject the Meep instance
+			MainWindow controller = fxmlLoader.getController();
+			controller.setMeep(meep); // inject the Meep instance
+			controller.setStage(stage); // provide stage for graceful shutdown
 			stage.show();
 		} catch (IOException e) {
 			e.printStackTrace();

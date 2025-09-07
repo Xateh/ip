@@ -403,4 +403,12 @@ public abstract class Command {
 			return response.toString();
 		}
 	}
+
+	/** Responds with a farewell message. */
+	static class ByeCommand extends Command {
+		@Override
+		public String execute() {
+			return "Bye. Hope to see you again soon!";
+		}
+	}
 }

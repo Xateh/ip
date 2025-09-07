@@ -55,6 +55,7 @@ public class Parser {
 			case "list messages" -> command = new Command.ListMessagesCommand();
 			case "list" -> command = new Command.ListTasksCommand();
 			case "help" -> command = new Command.HelpCommand();
+			case "bye" -> command = new Command.ByeCommand();
 			default -> {
 				if (message.startsWith("mark ")) {
 					try {
