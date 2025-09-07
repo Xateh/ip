@@ -3,11 +3,8 @@ package meep.tool;
 import java.util.ArrayList;
 
 /**
- * Mutable collection of {@link Task} items with simple iteration helpers.
- *
- * <p>
- * Encapsulates a backing {@link java.util.ArrayList} and exposes add/remove,
- * random access, size queries, and functional iteration utilities.
+ * Mutable collection of {@link Task} items with add/remove/access operations
+ * and iteration helpers.
  */
 class TaskList {
 	private final ArrayList<Task> tasks;
@@ -20,21 +17,18 @@ class TaskList {
 	/**
 	 * Adds a task to the end of the list.
 	 *
-	 * @param task
-	 *            task to add
+	 * @param task task to add
 	 */
 	public void addTask(Task task) {
-	assert task != null : "task must not be null";
+		assert task != null : "task must not be null";
 		tasks.add(task);
 	}
 
 	/**
 	 * Removes the task at the given zero-based index.
 	 *
-	 * @param index
-	 *            index of the task to remove
-	 * @throws IndexOutOfBoundsException
-	 *             if index is invalid
+	 * @param index index of the task to remove (0-based)
+	 * @throws IndexOutOfBoundsException if index is invalid
 	 */
 	public void removeTask(int index) {
 		tasks.remove(index);
@@ -48,11 +42,9 @@ class TaskList {
 	/**
 	 * Returns the task at the given zero-based index.
 	 *
-	 * @param index
-	 *            index to fetch
+	 * @param index index to fetch
 	 * @return the task at the index
-	 * @throws IndexOutOfBoundsException
-	 *             if index is invalid
+	 * @throws IndexOutOfBoundsException if index is invalid
 	 */
 	public Task get(int index) {
 		return tasks.get(index);
@@ -74,7 +66,7 @@ class TaskList {
 	 *            callback executed for each task
 	 */
 	public void iterateTasks(TaskAction action) {
-	assert action != null : "action must not be null";
+		assert action != null : "action must not be null";
 		for (Task task : tasks) {
 			action.apply(task);
 		}
@@ -87,7 +79,7 @@ class TaskList {
 	 *            callback executed for each task with its index
 	 */
 	public void iterateTasks(IndexTaskAction action) {
-	assert action != null : "action must not be null";
+		assert action != null : "action must not be null";
 		for (int i = 0; i < tasks.size(); i++) {
 			action.apply(tasks.get(i), i);
 		}

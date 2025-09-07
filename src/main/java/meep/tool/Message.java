@@ -4,11 +4,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Immutable user message with a timestamp.
+ * Immutable user message with a creation timestamp.
  *
- * <p>
- * Instances capture the message text and the creation time. The text must be
- * non-null.
+ * <p>Captures message text and time of creation. The text must be non-null.
  */
 class Message {
 	private final String message;
@@ -21,7 +19,7 @@ class Message {
 	 *            content
 	 */
 	Message(String message) {
-	assert message != null : "Message content must not be null";
+		assert message != null : "Message content must not be null";
 		this.message = message;
 		this.time = LocalDateTime.now();
 	}

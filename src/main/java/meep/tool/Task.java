@@ -8,8 +8,8 @@ import java.util.ArrayList;
 /**
  * Abstract base for tasks with Todo, Deadline and Event variants.
  *
- * <p>
- * Provides parsing helpers, serialization/deserialization, and due-date checks.
+ * <p>Provides parsing helpers, serialization/deserialization, and due-date
+ * checks.
  */
 public abstract class Task {
 	private static String inputDtfPattern = "yyyy-MM-dd";
@@ -112,8 +112,9 @@ public abstract class Task {
 	}
 
 	private Task(String description, boolean isDone) {
-	assert inputDtfPattern != null && !inputDtfPattern.isEmpty() : "input pattern must be set";
-	assert outputDtfPattern != null && !outputDtfPattern.isEmpty() : "output pattern must be set";
+		assert inputDtfPattern != null && !inputDtfPattern.isEmpty() : "input pattern must be set";
+		assert outputDtfPattern != null && !outputDtfPattern.isEmpty()
+				: "output pattern must be set";
 		if (description == null || description.trim().isEmpty()) {
 			throw new IllegalArgumentException("Task Description cannot be null or empty");
 		}
@@ -127,7 +128,7 @@ public abstract class Task {
 	}
 
 	public boolean checkDescriptionContains(String substring) {
-	assert substring != null : "substring must not be null";
+		assert substring != null : "substring must not be null";
 		return description.contains(substring);
 	}
 
@@ -203,7 +204,7 @@ public abstract class Task {
 	 * @return formatted date or original input on parse failure
 	 */
 	static String printTime(String time) {
-	assert time != null : "time must not be null";
+		assert time != null : "time must not be null";
 		try {
 			LocalDate ldt = LocalDate.parse(time, inputDtf);
 			return ldt.format(outputDtf);
@@ -219,20 +220,33 @@ public abstract class Task {
 
 	/** Todo task with only a description. */
 	private static class ToDoTask extends Task {
+		/**
+		 * Creates a Todo task.
+		 *
+		 * @param task description text
+		 */
 		ToDoTask(String task) {
 			this(task, false);
 		}
 
+		/**
+		 * Creates a Todo task with explicit completion state.
+		 *
+		 * @param task description text
+		 * @param isDone completion flag
+		 */
 		ToDoTask(String task, boolean isDone) {
 			super(task, isDone);
 		}
 
+		/** Returns false as Todo tasks have no due date. */
 		@Override
 		public boolean isDue(String time) {
 			assert time != null : "time must not be null";
 			return false;
 		}
 
+		/** String form prefixed with [T]. */
 		@Override
 		public String toString() {
 			return "[T]" + super.toString();
@@ -259,14 +273,32 @@ public abstract class Task {
 			return "";
 		}
 
+		/**
+		 * Creates a Deadline task from a raw command string containing "/by".
+		 *
+		 * @param task raw command string (e.g., "deadline desc /by yyyy-MM-dd")
+		 */
 		DeadlineTask(String task) {
 			this(task.split("/", 2)[0], extractDeadline(task));
 		}
 
+		/**
+		 * Creates a Deadline task with an explicit deadline.
+		 *
+		 * @param task description text
+		 * @param deadline date string in input format
+		 */
 		DeadlineTask(String task, String deadline) {
 			this(task, deadline, false);
 		}
 
+		/**
+		 * Creates a Deadline task with explicit deadline and completion state.
+		 *
+		 * @param task description text
+		 * @param deadline date string in input format
+		 * @param isDone completion flag
+		 */
 		DeadlineTask(String task, String deadline, boolean isDone) {
 			super(task, isDone);
 			if (deadline == null || deadline.trim().isEmpty()) {
@@ -286,6 +318,7 @@ public abstract class Task {
 			return deadline;
 		}
 
+		/** Determines if this deadline is due before the given date. */
 		@Override
 		public boolean isDue(String time) {
 			assert time != null : "time must not be null";
@@ -298,6 +331,7 @@ public abstract class Task {
 			}
 		}
 
+		/** String form prefixed with [D] and printed deadline. */
 		@Override
 		public String toString() {
 			return "[D]" + super.toString() + " (by: " + printTime(getDeadline()) + ")";
@@ -309,6 +343,12 @@ public abstract class Task {
 		private String eventStartTime;
 		private String eventEndTime;
 
+		/**
+		 * Creates an Event task from a raw command string containing "/from" and
+		 * "/to".
+		 *
+		 * @param task raw command string (e.g., "event desc /from yyyy-MM-dd /to yyyy-MM-dd")
+		 */
 		EventTask(String task) {
 			this(
 					task.split("/", 2)[0],
@@ -316,10 +356,25 @@ public abstract class Task {
 					EventTask.extractEndTime(task));
 		}
 
+		/**
+		 * Creates an Event task with explicit start and end times.
+		 *
+		 * @param task description text
+		 * @param eventStartTime start date string in input format
+		 * @param eventEndTime end date string in input format
+		 */
 		EventTask(String task, String eventStartTime, String eventEndTime) {
 			this(task, eventStartTime, eventEndTime, false);
 		}
 
+		/**
+		 * Creates an Event task with explicit times and completion state.
+		 *
+		 * @param task description text
+		 * @param eventStartTime start date string in input format
+		 * @param eventEndTime end date string in input format
+		 * @param isDone completion flag
+		 */
 		EventTask(String task, String eventStartTime, String eventEndTime, boolean isDone) {
 			super(task, isDone);
 			if (eventStartTime == null || eventStartTime.trim().isEmpty()) {
@@ -375,7 +430,8 @@ public abstract class Task {
 		 * @return start date
 		 */
 		public String getEventStartTime() {
-			assert eventStartTime != null && !eventStartTime.isEmpty() : "event start time must be initialized";
+			assert eventStartTime != null && !eventStartTime.isEmpty()
+					: "event start time must be initialized";
 			return eventStartTime;
 		}
 
@@ -385,10 +441,12 @@ public abstract class Task {
 		 * @return end date
 		 */
 		public String getEventEndTime() {
-			assert eventEndTime != null && !eventEndTime.isEmpty() : "event end time must be initialized";
+			assert eventEndTime != null && !eventEndTime.isEmpty()
+					: "event end time must be initialized";
 			return eventEndTime;
 		}
 
+		/** Determines if the event ends before the given date. */
 		@Override
 		public boolean isDue(String time) {
 			assert time != null : "time must not be null";
@@ -401,6 +459,7 @@ public abstract class Task {
 			}
 		}
 
+		/** String form prefixed with [E] including printed start and end. */
 		@Override
 		public String toString() {
 			return "[E]"
