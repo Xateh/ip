@@ -7,6 +7,7 @@ public class Ui {
 	private static Scanner scanner = new Scanner(System.in);
 
 	static void setScanner(Scanner newScanner) {
+	assert newScanner != null : "scanner must not be null";
 		scanner = newScanner;
 	}
 
@@ -16,6 +17,7 @@ public class Ui {
 	 * @return the raw command line
 	 */
 	public static String readCommand() {
+	assert scanner != null : "scanner must be initialized";
 		String command = scanner.nextLine();
 		return command;
 	}
@@ -27,6 +29,7 @@ public class Ui {
 	 *            content to print
 	 */
 	public static void printResponse(String response) {
+	assert response != null : "response must not be null";
 		System.out.println("-".repeat(50));
 		System.out.println(response);
 		System.out.println("-".repeat(50));

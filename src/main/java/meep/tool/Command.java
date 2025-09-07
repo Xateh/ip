@@ -23,6 +23,7 @@ public abstract class Command {
 		private final String message;
 
 		AddMessageCommand(String message) {
+			assert message != null : "message must not be null";
 			this.message = message;
 		}
 
@@ -145,6 +146,7 @@ public abstract class Command {
 		private final String message;
 
 		AddTaskCommand(String message) {
+			assert message != null && !message.trim().isEmpty() : "task command must not be null or empty";
 			this.message = message;
 		}
 
@@ -198,6 +200,7 @@ public abstract class Command {
 		private final String message; // full command string: "check due <date>"
 
 		CheckDueCommand(String message) {
+			assert message != null && message.startsWith("check due") : "expected 'check due <date>'";
 			this.message = message;
 		}
 
@@ -285,6 +288,7 @@ public abstract class Command {
 		private final String command;
 
 		UnknownCommand(String command) {
+			assert command != null : "raw command must not be null";
 			this.command = command;
 		}
 
@@ -302,6 +306,7 @@ public abstract class Command {
 		private final String needle;
 
 		FindCommand(String needle) {
+			assert needle != null : "search needle must not be null";
 			this.needle = needle;
 		}
 

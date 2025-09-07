@@ -18,6 +18,7 @@ class TaskList {
 	 *            task to add
 	 */
 	public void addTask(Task task) {
+	assert task != null : "task must not be null";
 		tasks.add(task);
 	}
 
@@ -67,6 +68,7 @@ class TaskList {
 	 *            callback executed for each task
 	 */
 	public void iterateTasks(TaskAction action) {
+	assert action != null : "action must not be null";
 		for (Task task : tasks) {
 			action.apply(task);
 		}
@@ -79,6 +81,7 @@ class TaskList {
 	 *            callback executed for each task with its index
 	 */
 	public void iterateTasks(IndexTaskAction action) {
+	assert action != null : "action must not be null";
 		for (int i = 0; i < tasks.size(); i++) {
 			action.apply(tasks.get(i), i);
 		}

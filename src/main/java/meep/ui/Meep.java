@@ -35,8 +35,10 @@ public class Meep {
 
 	/** Generates a response for the user's chat message. */
 	public Pair<String, String> getResponse(String input) {
+		assert input != null : "input must not be null";
 		try {
 			Command c = Parser.parseQuiet(input);
+			assert c != null : "Parser should return a command";
 			return new Pair<>(c.execute(), c.getClass().getSimpleName());
 		} catch (Exception e) {
 			return new Pair<>("Error: " + e.getMessage(), "Error");
