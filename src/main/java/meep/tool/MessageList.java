@@ -19,6 +19,7 @@ class MessageList {
 	 * @return the string representation of the added message
 	 */
 	public String addMessage(String message) {
+	assert message != null : "message must not be null";
 		return addMessage(new Message(message));
 	}
 
@@ -30,6 +31,7 @@ class MessageList {
 	 * @return the string representation of the added message
 	 */
 	public String addMessage(Message message) {
+	assert message != null : "message must not be null";
 		messages.add(message);
 		return message.toString();
 	}

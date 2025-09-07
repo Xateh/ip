@@ -27,6 +27,7 @@ public abstract class Command {
 
 		AddMessageCommand(String message) {
 			assert message != null : "message must not be null";
+			assert message != null : "message must not be null";
 			this.message = message;
 		}
 
@@ -293,6 +294,7 @@ public abstract class Command {
 		private final String command;
 
 		UnknownCommand(String command) {
+			assert command != null : "raw command must not be null";
 			this.command = command;
 		}
 
@@ -310,6 +312,7 @@ public abstract class Command {
 		private final String needle;
 
 		FindCommand(String needle) {
+			assert needle != null : "search needle must not be null";
 			this.needle = needle;
 		}
 
