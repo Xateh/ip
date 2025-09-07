@@ -5,33 +5,31 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * In-memory list of {@link Message} with simple operations and iteration
- * helpers.
+ * In-memory list of {@link Message} with add/remove/access operations and
+ * iteration helpers.
  */
 class MessageList {
-	private ArrayList<Message> messages = new ArrayList<>();
+	private final ArrayList<Message> messages = new ArrayList<>();
 
 	/**
 	 * Adds a message by content, creating a {@link Message} with current timestamp.
 	 *
-	 * @param message
-	 *            content
+	 * @param message content
 	 * @return the string representation of the added message
 	 */
 	public String addMessage(String message) {
-	assert message != null : "message must not be null";
+		assert message != null : "message must not be null";
 		return addMessage(new Message(message));
 	}
 
 	/**
 	 * Adds an existing message object to the list.
 	 *
-	 * @param message
-	 *            message instance
+	 * @param message message instance
 	 * @return the string representation of the added message
 	 */
 	public String addMessage(Message message) {
-	assert message != null : "message must not be null";
+		assert message != null : "message must not be null";
 		messages.add(message);
 		return message.toString();
 	}
@@ -39,8 +37,7 @@ class MessageList {
 	/**
 	 * Removes and returns the message at an index.
 	 *
-	 * @param index
-	 *            0-based index
+	 * @param index 0-based index
 	 * @return removed message
 	 */
 	public Message removeMessage(int index) {
@@ -69,20 +66,20 @@ class MessageList {
 	/**
 	 * Iterates over messages with a simple action.
 	 *
-	 * @param action
-	 *            callback invoked for each message
+	 * @param action callback invoked for each message
 	 */
 	public void iterateMessages(MessageAction action) {
+		assert action != null : "action must not be null";
 		messages.forEach(action::apply);
 	}
 
 	/**
 	 * Iterates over messages with index and message.
 	 *
-	 * @param action
-	 *            callback invoked for each (message, index)
+	 * @param action callback invoked for each (message, index)
 	 */
 	public void iterateMessages(IndexMessageAction action) {
+		assert action != null : "action must not be null";
 		IntStream.range(0, messages.size()).forEach(i -> action.apply(messages.get(i), i));
 	}
 

@@ -12,8 +12,8 @@ import java.util.List;
  */
 public abstract class Command {
 	// Shared application state for all commands
-	protected static final MessageList messages = new MessageList();
-	protected static final TaskList tasklist = new TaskList();
+	protected static final MessageList MESSAGES = new MessageList();
+	protected static final TaskList TASKS = new TaskList();
 
 	/**
 	 * Executes the command and returns the response text. Return an empty string if
@@ -25,21 +25,28 @@ public abstract class Command {
 	static class AddMessageCommand extends Command {
 		private final String message;
 
+		/**
+		 * Creates a command that records a raw input message.
+		 *
+		 * @param message the input text to record
+		 */
 		AddMessageCommand(String message) {
 			assert message != null : "message must not be null";
 			assert message != null : "message must not be null";
 			this.message = message;
 		}
 
+		/** Executes and returns an empty response after recording the message. */
 		@Override
 		public String execute() {
-			messages.addMessage(message);
+			MESSAGES.addMessage(message);
 			return "";
 		}
 	}
 
 	/** Prints a hello response. */
 	static class HelloCommand extends Command {
+		/** Executes the hello command. */
 		@Override
 		public String execute() {
 			return "Hello there!";
@@ -48,6 +55,7 @@ public abstract class Command {
 
 	/** Prints a canned "how are you" response. */
 	static class HowAreYouCommand extends Command {
+		/** Executes the canned response. */
 		@Override
 		public String execute() {
 			return "I'm just a program, but thanks for asking!";
@@ -56,24 +64,26 @@ public abstract class Command {
 
 	/** Lists all messages recorded. */
 	static class ListMessagesCommand extends Command {
+		/** Builds the list of recorded messages. */
 		@Override
 		public String execute() {
 			StringBuilder response = new StringBuilder();
 			response.append("Here are all the messages I've received:");
-			messages.iterateMessages((msg, idx) -> response.append("\n " + (idx + 1) + ". " + msg));
+			MESSAGES.iterateMessages((msg, idx) -> response.append("\n " + (idx + 1) + ". " + msg));
 			return response.toString();
 		}
 	}
 
 	/** Lists all tasks with count. */
 	static class ListTasksCommand extends Command {
+		/** Builds the list of tasks with count. */
 		@Override
 		public String execute() {
 			StringBuilder response = new StringBuilder();
 			response.append("Here are all the tasks:");
-			tasklist.iterateTasks(
+			TASKS.iterateTasks(
 					(task, index) -> response.append("\n " + (index + 1) + ". " + task));
-			response.append("\nNow you have " + tasklist.size() + " tasks in the list.");
+			response.append("\nNow you have " + TASKS.size() + " tasks in the list.");
 			return response.toString();
 		}
 	}
@@ -82,17 +92,23 @@ public abstract class Command {
 	static class MarkCommand extends Command {
 		private final int taskNumber; // 1-based
 
+		/**
+		 * Creates a command to mark a task as done.
+		 *
+		 * @param taskNumber 1-based task number to mark
+		 */
 		MarkCommand(int taskNumber) {
 			this.taskNumber = taskNumber;
 		}
 
+		/** Marks the specified task as done if valid. */
 		@Override
 		public String execute() {
 			StringBuilder response = new StringBuilder();
 			try {
 				int index = taskNumber - 1;
-				tasklist.get(index).markDone();
-				response.append("Task " + taskNumber + " marked as done.\n" + tasklist.get(index));
+				TASKS.get(index).markDone();
+				response.append("Task " + taskNumber + " marked as done.\n" + TASKS.get(index));
 			} catch (NumberFormatException | IndexOutOfBoundsException e) {
 				return ""; // maintain prior behavior: no output on invalid index
 			}
@@ -104,18 +120,24 @@ public abstract class Command {
 	static class UnmarkCommand extends Command {
 		private final int taskNumber; // 1-based
 
+		/**
+		 * Creates a command to mark a task as not done.
+		 *
+		 * @param taskNumber 1-based task number to unmark
+		 */
 		UnmarkCommand(int taskNumber) {
 			this.taskNumber = taskNumber;
 		}
 
+		/** Marks the specified task as not done if valid. */
 		@Override
 		public String execute() {
 			StringBuilder response = new StringBuilder();
 			try {
 				int index = taskNumber - 1;
-				tasklist.get(index).markNotDone();
+				TASKS.get(index).markNotDone();
 				response.append(
-						"Task " + taskNumber + " marked as not done.\n" + tasklist.get(index));
+						"Task " + taskNumber + " marked as not done.\n" + TASKS.get(index));
 			} catch (NumberFormatException | IndexOutOfBoundsException e) {
 				return ""; // maintain prior behavior: no output on invalid index
 			}
@@ -127,16 +149,22 @@ public abstract class Command {
 	static class DeleteCommand extends Command {
 		private final int taskNumber; // 1-based
 
+		/**
+		 * Creates a command to delete a task.
+		 *
+		 * @param taskNumber 1-based task number to delete
+		 */
 		DeleteCommand(int taskNumber) {
 			this.taskNumber = taskNumber;
 		}
 
+		/** Deletes the specified task if the index is valid. */
 		@Override
 		public String execute() {
 			StringBuilder response = new StringBuilder();
 			try {
 				int index = taskNumber - 1;
-				tasklist.removeTask(index);
+				TASKS.removeTask(index);
 				response.append("Task " + taskNumber + " deleted.");
 			} catch (NumberFormatException | IndexOutOfBoundsException e) {
 				return ""; // maintain prior behavior: no output on invalid index
@@ -149,12 +177,19 @@ public abstract class Command {
 	static class AddTaskCommand extends Command {
 		private final String message;
 
+		/**
+		 * Creates a command to parse and add a task from the raw command string.
+		 *
+		 * @param message the full task command (e.g., "todo ...", "deadline ...",
+		 *                "event ...")
+		 */
 		AddTaskCommand(String message) {
 			assert message != null && !message.trim().isEmpty()
 					: "task command must not be null or empty";
 			this.message = message;
 		}
 
+		/** Parses the task and adds it, returning the outcome message. */
 		@Override
 		public String execute() {
 			StringBuilder response = new StringBuilder();
@@ -162,9 +197,9 @@ public abstract class Command {
 			if (buildPair.getSecond() != null) {
 				response.append(buildPair.getSecond().getMessage());
 			} else {
-				tasklist.addTask(buildPair.getFirst());
+				TASKS.addTask(buildPair.getFirst());
 				response.append("Got it. I've added this task:\n" + buildPair.getFirst());
-				response.append("\nNow you have " + tasklist.size() + " tasks in the list.");
+				response.append("\nNow you have " + TASKS.size() + " tasks in the list.");
 			}
 			return response.toString();
 		}
@@ -172,10 +207,11 @@ public abstract class Command {
 
 	/** Saves tasks to storage. */
 	static class SaveCommand extends Command {
+		/** Saves tasks to storage and returns a status message. */
 		@Override
 		public String execute() {
 			StringBuilder response = new StringBuilder();
-			boolean flag = Storage.saveTasks(tasklist, response);
+			boolean flag = Storage.saveTasks(TASKS, response);
 			if (flag) {
 				response.append("Tasks saved successfully.");
 			} else {
@@ -187,10 +223,11 @@ public abstract class Command {
 
 	/** Loads tasks from storage. */
 	static class LoadCommand extends Command {
+		/** Loads tasks from storage and returns a status message. */
 		@Override
 		public String execute() {
 			StringBuilder response = new StringBuilder();
-			boolean flag = Storage.loadTasks(tasklist, response);
+			boolean flag = Storage.loadTasks(TASKS, response);
 			if (flag) {
 				response.append("Tasks loaded successfully.");
 			} else {
@@ -204,12 +241,18 @@ public abstract class Command {
 	static class CheckDueCommand extends Command {
 		private final String message; // full command string: "check due <date>"
 
+		/**
+		 * Creates a command to check tasks due before a given date.
+		 *
+		 * @param message full command string in the form "check due <date>"
+		 */
 		CheckDueCommand(String message) {
 			assert message != null && message.startsWith("check due")
 					: "expected 'check due <date>'";
 			this.message = message;
 		}
 
+		/** Checks due tasks and returns a formatted report. */
 		@Override
 		public String execute() {
 			StringBuilder response = new StringBuilder();
@@ -224,7 +267,7 @@ public abstract class Command {
 			// Tests expect this preface line
 			response.append("Checking for due tasks on ").append(processedTime).append("...");
 
-			tasklist.iterateTasks(
+			TASKS.iterateTasks(
 					task -> {
 						try {
 							if (task.isDue(time)) {
@@ -249,6 +292,7 @@ public abstract class Command {
 
 	/** Prints help text listing commands and usage patterns. */
 	static class HelpCommand extends Command {
+		/** Returns the help/usage text. */
 		@Override
 		public String execute() {
 			StringBuilder response = new StringBuilder();
@@ -293,11 +337,17 @@ public abstract class Command {
 	static class UnknownCommand extends Command {
 		private final String command;
 
+		/**
+		 * Creates a command that reports an unrecognised input.
+		 *
+		 * @param command the full raw input
+		 */
 		UnknownCommand(String command) {
 			assert command != null : "raw command must not be null";
 			this.command = command;
 		}
 
+		/** Builds the unknown-command response, echoing the input. */
 		@Override
 		public String execute() {
 			return "Unrecognised command: \""
@@ -311,16 +361,22 @@ public abstract class Command {
 	static class FindCommand extends Command {
 		private final String needle;
 
+		/**
+		 * Creates a command to find tasks with descriptions containing a substring.
+		 *
+		 * @param needle the case-sensitive search substring
+		 */
 		FindCommand(String needle) {
 			assert needle != null : "search needle must not be null";
 			this.needle = needle;
 		}
 
+		/** Searches tasks and returns the formatted list of matches. */
 		@Override
 		public String execute() {
 			StringBuilder response = new StringBuilder();
 			List<Task> matches =
-					tasklist.stream()
+					TASKS.stream()
 							.filter(task -> task.checkDescriptionContains(needle))
 							.toList();
 
@@ -330,9 +386,9 @@ public abstract class Command {
 				response.append("Found the following tasks matching: \"")
 						.append(needle)
 						.append("\"");
-				for (int i = 0; i < matches.size(); i++) {
-					response.append("\n").append(i + 1).append(") ").append(matches.get(i));
-				}
+				matches.stream().forEach(task -> {
+					response.append("\n").append(matches.indexOf(task) + 1).append(") ").append(task);
+				});
 			}
 
 			return response.toString();

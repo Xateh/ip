@@ -5,8 +5,9 @@ import meep.tool.Pair;
 import meep.tool.Parser;
 
 /**
- * Application entry point for Meep. Runs a simple REPL until the user types
- * "bye".
+ * Application entry point for Meep's console app.
+ *
+ * <p>Runs a simple REPL until the user types "bye".
  */
 public class Meep {
 	/**
@@ -33,7 +34,12 @@ public class Meep {
 		Ui.printResponse("Bye. Hope to see you again soon!");
 	}
 
-	/** Generates a response for the user's chat message. */
+	/**
+	 * Generates a response for a user's chat message.
+	 *
+	 * @param input raw user input
+	 * @return pair of (response text, command type)
+	 */
 	public Pair<String, String> getResponse(String input) {
 		assert input != null : "input must not be null";
 		try {

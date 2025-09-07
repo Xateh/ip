@@ -3,10 +3,14 @@ package meep.tool;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/** Immutable user message with a timestamp. */
+/**
+ * Immutable user message with a creation timestamp.
+ *
+ * <p>Captures message text and time of creation. The text must be non-null.
+ */
 class Message {
-	private String message;
-	private LocalDateTime time;
+	private final String message;
+	private final LocalDateTime time;
 
 	/**
 	 * Creates a message with the current timestamp.
@@ -15,7 +19,7 @@ class Message {
 	 *            content
 	 */
 	Message(String message) {
-	assert message != null : "Message content must not be null";
+		assert message != null : "Message content must not be null";
 		this.message = message;
 		this.time = LocalDateTime.now();
 	}
@@ -23,7 +27,7 @@ class Message {
 	/**
 	 * Returns a formatted string representation including timestamp and content.
 	 *
-	 * @return formatted message string
+	 * @return formatted "[yyyy-MM-dd HH:mm:ss] <text>" string
 	 */
 	@Override
 	public String toString() {
