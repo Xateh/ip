@@ -17,6 +17,7 @@ class MessageList {
 	 * @return the string representation of the added message
 	 */
 	public String addMessage(String message) {
+	assert message != null : "message must not be null";
 		return addMessage(new Message(message));
 	}
 
@@ -28,6 +29,7 @@ class MessageList {
 	 * @return the string representation of the added message
 	 */
 	public String addMessage(Message message) {
+	assert message != null : "message must not be null";
 		messages.add(message);
 		return message.toString();
 	}
@@ -69,6 +71,7 @@ class MessageList {
 	 *            callback invoked for each message
 	 */
 	public void iterateMessages(MessageAction action) {
+	assert action != null : "action must not be null";
 		for (Message message : messages) {
 			action.apply(message);
 		}
@@ -81,6 +84,7 @@ class MessageList {
 	 *            callback invoked for each (message, index)
 	 */
 	public void iterateMessages(IndexMessageAction action) {
+	assert action != null : "action must not be null";
 		for (int i = 0; i < messages.size(); i++) {
 			action.apply(messages.get(i), i);
 		}

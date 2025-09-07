@@ -14,6 +14,7 @@ public class Parser {
 	 *            user input
 	 */
 	public static Command parse(String message) {
+	assert message != null : "input message must not be null";
 		// record message silently
 		new Command.AddMessageCommand(message).execute();
 
@@ -63,7 +64,7 @@ public class Parser {
 			}
 		}
 
-		if (command != null) {
+	if (command != null) {
 			String response = command.execute();
 			if (!response.isEmpty()) {
 				Ui.printResponse(response);
@@ -77,6 +78,7 @@ public class Parser {
 	 * the message.
 	 */
 	public static Command parseQuiet(String message) {
+	assert message != null : "input message must not be null";
 		// record message silently
 		new Command.AddMessageCommand(message).execute();
 		Command command = null;
@@ -112,6 +114,6 @@ public class Parser {
 				}
 			}
 		}
-		return command;
+	return command;
 	}
 }

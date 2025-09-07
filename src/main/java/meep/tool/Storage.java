@@ -23,6 +23,9 @@ class Storage {
 	 * @return true if write succeeded
 	 */
 	public static boolean saveTasks(TaskList tasklist, StringBuilder response) {
+	assert tasklist != null : "tasklist must not be null";
+	assert response != null : "response buffer must not be null";
+	assert FILE_PATH != null && !FILE_PATH.isEmpty() : "FILE_PATH must be configured";
 		try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH))) {
 			tasklist.iterateTasks(task -> writer.println(Task.saveString(task)));
 			return true;
@@ -42,6 +45,9 @@ class Storage {
 	 * @return true if entire load succeeded; false if file missing or read error
 	 */
 	public static boolean loadTasks(TaskList tasklist, StringBuilder response) {
+	assert tasklist != null : "tasklist must not be null";
+	assert response != null : "response buffer must not be null";
+	assert FILE_PATH != null && !FILE_PATH.isEmpty() : "FILE_PATH must be configured";
 		File file = new File(FILE_PATH);
 		if (!file.exists()) {
 			return false;
@@ -67,6 +73,7 @@ class Storage {
 	}
 
 	public static void setSaveFile(String path) {
+	assert path != null && !path.trim().isEmpty() : "save file path must not be null or empty";
 		FILE_PATH = path;
 	}
 }
