@@ -1,17 +1,24 @@
 .label {
+    background-color: linear-gradient(to bottom right, #00ffbf, #00ddff); /* standard */
     -fx-background-color: linear-gradient(to bottom right, #00ffbf, #00ddff);
+    border-color: #d55e00 #009e73 #cc79a7 #0072b2; /* standard */
     -fx-border-color: #d55e00 #009e73 #cc79a7 #0072b2;
+    border-width: 2px; /* standard */
     -fx-border-width: 2px;
+    padding: 6px; /* standard */
     -fx-padding: 6px;
     -fx-border-insets: 0px 7px 0px 7px;
     -fx-background-insets: 0px 7px 0px 7px;
     -fx-background-radius: 1em 1em 0 1em;
+    border-radius: 1em 1em 0 1em; /* standard */
     -fx-border-radius: 1em 1em 0 1em;
-    -fx-text-fill: ladder(background, white 49%, black 50%);
+    /* Auto choose white/black text depending on the looked-up bg color */
+    -fx-text-fill: ladder(-fx-background-color, white 49%, black 50%);
 }
 
 .reply-label {
     -fx-background-radius: 1em 1em 1em 0;
+    border-radius: 1em 1em 1em 0; /* standard */
     -fx-border-radius: 1em 1em 1em 0;
 }
 
@@ -24,22 +31,27 @@
     -fx-scale-y: 1;
 
     /* Rotate image clockwise by degrees. */
+    rotate: 0; /* standard */
     -fx-rotate: 0;
 }
 
 .reply-label {
     -fx-background-radius: 1em 1em 1em 0;
+    border-radius: 1em 1em 1em 0; /* standard */
     -fx-border-radius: 1em 1em 1em 0;
 }
 
 .add-label {
+    background-color: yellow; /* standard */
     -fx-background-color: yellow;
 }
 
 .marked-label {
+    background-color: palegreen; /* standard */
     -fx-background-color: palegreen;
 }
 
 .delete-label {
+    background-color: lightpink; /* standard */
     -fx-background-color: lightpink;
 }
