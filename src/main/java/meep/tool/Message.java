@@ -21,6 +21,7 @@ class Message {
 	 *            content
 	 */
 	Message(String message) {
+	assert message != null : "Message content must not be null";
 		this.message = message;
 		this.time = LocalDateTime.now();
 	}

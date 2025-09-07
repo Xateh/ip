@@ -112,6 +112,8 @@ public abstract class Task {
 	}
 
 	private Task(String description, boolean isDone) {
+	assert inputDtfPattern != null && !inputDtfPattern.isEmpty() : "input pattern must be set";
+	assert outputDtfPattern != null && !outputDtfPattern.isEmpty() : "output pattern must be set";
 		if (description == null || description.trim().isEmpty()) {
 			throw new IllegalArgumentException("Task Description cannot be null or empty");
 		}
@@ -125,6 +127,7 @@ public abstract class Task {
 	}
 
 	public boolean checkDescriptionContains(String substring) {
+	assert substring != null : "substring must not be null";
 		return description.contains(substring);
 	}
 
@@ -200,6 +203,7 @@ public abstract class Task {
 	 * @return formatted date or original input on parse failure
 	 */
 	static String printTime(String time) {
+	assert time != null : "time must not be null";
 		try {
 			LocalDate ldt = LocalDate.parse(time, inputDtf);
 			return ldt.format(outputDtf);
@@ -225,6 +229,7 @@ public abstract class Task {
 
 		@Override
 		public boolean isDue(String time) {
+			assert time != null : "time must not be null";
 			return false;
 		}
 
@@ -277,11 +282,13 @@ public abstract class Task {
 		 * @return deadline
 		 */
 		public String getDeadline() {
+			assert deadline != null && !deadline.isEmpty() : "deadline must be initialized";
 			return deadline;
 		}
 
 		@Override
 		public boolean isDue(String time) {
+			assert time != null : "time must not be null";
 			try {
 				return !isDone()
 						&& LocalDate.parse(time, inputDtf)
@@ -368,6 +375,7 @@ public abstract class Task {
 		 * @return start date
 		 */
 		public String getEventStartTime() {
+			assert eventStartTime != null && !eventStartTime.isEmpty() : "event start time must be initialized";
 			return eventStartTime;
 		}
 
@@ -377,11 +385,13 @@ public abstract class Task {
 		 * @return end date
 		 */
 		public String getEventEndTime() {
+			assert eventEndTime != null && !eventEndTime.isEmpty() : "event end time must be initialized";
 			return eventEndTime;
 		}
 
 		@Override
 		public boolean isDue(String time) {
+			assert time != null : "time must not be null";
 			try {
 				return !isDone()
 						&& LocalDate.parse(time, inputDtf)

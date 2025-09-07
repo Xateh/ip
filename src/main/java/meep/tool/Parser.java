@@ -105,6 +105,6 @@ public class Parser {
 				}
 			}
 		}
-		return command;
+	return command;
 	}
 }
