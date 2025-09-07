@@ -30,6 +30,7 @@ public class Main extends Application {
 			Scene scene = new Scene(ap);
 
 			stage.setScene(scene);
+			stage.setTitle("Meep");
 			fxmlLoader.<MainWindow>getController().setMeep(meep); // inject the Meep instance
 			stage.show();
 		} catch (IOException e) {
