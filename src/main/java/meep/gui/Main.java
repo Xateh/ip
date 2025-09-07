@@ -8,7 +8,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import meep.ui.Meep;
 
-/** A GUI for Duke using FXML. */
+/**
+ * JavaFX entry-point for Meep using FXML layouts.
+ *
+ * <p>Loads the main window from FXML and wires the controller with a Meep
+ * instance.
+ */
 public class Main extends Application {
 
 	private Meep duke = new Meep();

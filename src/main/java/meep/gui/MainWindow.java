@@ -10,7 +10,7 @@ import javafx.scene.layout.VBox;
 import meep.tool.Pair;
 import meep.ui.Meep;
 
-/** Controller for the main GUI. */
+/** Main window controller for the JavaFX GUI. */
 public class MainWindow extends AnchorPane {
 	@FXML
 	private ScrollPane scrollPane;
