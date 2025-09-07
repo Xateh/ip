@@ -14,7 +14,8 @@ class MessageList {
 	/**
 	 * Adds a message by content, creating a {@link Message} with current timestamp.
 	 *
-	 * @param message content
+	 * @param message
+	 *            content
 	 * @return the string representation of the added message
 	 */
 	public String addMessage(String message) {
@@ -25,7 +26,8 @@ class MessageList {
 	/**
 	 * Adds an existing message object to the list.
 	 *
-	 * @param message message instance
+	 * @param message
+	 *            message instance
 	 * @return the string representation of the added message
 	 */
 	public String addMessage(Message message) {
@@ -37,7 +39,8 @@ class MessageList {
 	/**
 	 * Removes and returns the message at an index.
 	 *
-	 * @param index 0-based index
+	 * @param index
+	 *            0-based index
 	 * @return removed message
 	 */
 	public Message removeMessage(int index) {
@@ -66,7 +69,8 @@ class MessageList {
 	/**
 	 * Iterates over messages with a simple action.
 	 *
-	 * @param action callback invoked for each message
+	 * @param action
+	 *            callback invoked for each message
 	 */
 	public void iterateMessages(MessageAction action) {
 		assert action != null : "action must not be null";
@@ -76,7 +80,8 @@ class MessageList {
 	/**
 	 * Iterates over messages with index and message.
 	 *
-	 * @param action callback invoked for each (message, index)
+	 * @param action
+	 *            callback invoked for each (message, index)
 	 */
 	public void iterateMessages(IndexMessageAction action) {
 		assert action != null : "action must not be null";

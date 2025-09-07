@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fx:id="scroll" fitToWidth="true" hbarPolicy="NEVER" stylesheets="@../css/help.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+    <content>
+        <VBox fx:id="content" spacing="10.0" styleClass="help-root">
+            <children>
+                <Label fx:id="header" text="Meep Commands" wrapText="true" styleClass="help-header" />
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>

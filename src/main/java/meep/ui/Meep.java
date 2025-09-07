@@ -7,7 +7,8 @@ import meep.tool.Parser;
 /**
  * Application entry point for Meep's console app.
  *
- * <p>Runs a simple REPL until the user types "bye".
+ * <p>
+ * Runs a simple REPL until the user types "bye".
  */
 public class Meep {
 	/**
@@ -37,7 +38,8 @@ public class Meep {
 	/**
 	 * Generates a response for a user's chat message.
 	 *
-	 * @param input raw user input
+	 * @param input
+	 *            raw user input
 	 * @return pair of (response text, command type)
 	 */
 	public Pair<String, String> getResponse(String input) {

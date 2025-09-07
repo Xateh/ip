@@ -5,8 +5,8 @@ import java.util.Scanner;
 /**
  * Console I/O helper for Meep.
  *
- * <p>Abstracts reading user input and printing framed responses to standard
- * out.
+ * <p>
+ * Abstracts reading user input and printing framed responses to standard out.
  */
 public class Ui {
 	private static Scanner scanner = new Scanner(System.in);
@@ -14,7 +14,8 @@ public class Ui {
 	/**
 	 * Replaces the input scanner used by {@link #readCommand()}.
 	 *
-	 * @param newScanner a non-null scanner instance
+	 * @param newScanner
+	 *            a non-null scanner instance
 	 */
 	static void setScanner(Scanner newScanner) {
 		assert newScanner != null : "scanner must not be null";
@@ -31,7 +32,8 @@ public class Ui {
 	/**
 	 * Prints a response message framed by a horizontal rule.
 	 *
-	 * @param response content to print
+	 * @param response
+	 *            content to print
 	 */
 	public static void printResponse(String response) {
 		assert response != null : "response must not be null";

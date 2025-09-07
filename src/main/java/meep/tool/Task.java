@@ -8,8 +8,8 @@ import java.util.ArrayList;
 /**
  * Abstract base for tasks with Todo, Deadline and Event variants.
  *
- * <p>Provides parsing helpers, serialization/deserialization, and due-date
- * checks.
+ * <p>
+ * Provides parsing helpers, serialization/deserialization, and due-date checks.
  */
 public abstract class Task {
 	private static String inputDtfPattern = "yyyy-MM-dd";
@@ -223,7 +223,8 @@ public abstract class Task {
 		/**
 		 * Creates a Todo task.
 		 *
-		 * @param task description text
+		 * @param task
+		 *            description text
 		 */
 		ToDoTask(String task) {
 			this(task, false);
@@ -232,8 +233,10 @@ public abstract class Task {
 		/**
 		 * Creates a Todo task with explicit completion state.
 		 *
-		 * @param task description text
-		 * @param isDone completion flag
+		 * @param task
+		 *            description text
+		 * @param isDone
+		 *            completion flag
 		 */
 		ToDoTask(String task, boolean isDone) {
 			super(task, isDone);
@@ -276,7 +279,8 @@ public abstract class Task {
 		/**
 		 * Creates a Deadline task from a raw command string containing "/by".
 		 *
-		 * @param task raw command string (e.g., "deadline desc /by yyyy-MM-dd")
+		 * @param task
+		 *            raw command string (e.g., "deadline desc /by yyyy-MM-dd")
 		 */
 		DeadlineTask(String task) {
 			this(task.split("/", 2)[0], extractDeadline(task));
@@ -285,8 +289,10 @@ public abstract class Task {
 		/**
 		 * Creates a Deadline task with an explicit deadline.
 		 *
-		 * @param task description text
-		 * @param deadline date string in input format
+		 * @param task
+		 *            description text
+		 * @param deadline
+		 *            date string in input format
 		 */
 		DeadlineTask(String task, String deadline) {
 			this(task, deadline, false);
@@ -295,9 +301,12 @@ public abstract class Task {
 		/**
 		 * Creates a Deadline task with explicit deadline and completion state.
 		 *
-		 * @param task description text
-		 * @param deadline date string in input format
-		 * @param isDone completion flag
+		 * @param task
+		 *            description text
+		 * @param deadline
+		 *            date string in input format
+		 * @param isDone
+		 *            completion flag
 		 */
 		DeadlineTask(String task, String deadline, boolean isDone) {
 			super(task, isDone);
@@ -344,10 +353,11 @@ public abstract class Task {
 		private String eventEndTime;
 
 		/**
-		 * Creates an Event task from a raw command string containing "/from" and
-		 * "/to".
+		 * Creates an Event task from a raw command string containing "/from" and "/to".
 		 *
-		 * @param task raw command string (e.g., "event desc /from yyyy-MM-dd /to yyyy-MM-dd")
+		 * @param task
+		 *            raw command string (e.g., "event desc /from yyyy-MM-dd /to
+		 *            yyyy-MM-dd")
 		 */
 		EventTask(String task) {
 			this(
@@ -359,9 +369,12 @@ public abstract class Task {
 		/**
 		 * Creates an Event task with explicit start and end times.
 		 *
-		 * @param task description text
-		 * @param eventStartTime start date string in input format
-		 * @param eventEndTime end date string in input format
+		 * @param task
+		 *            description text
+		 * @param eventStartTime
+		 *            start date string in input format
+		 * @param eventEndTime
+		 *            end date string in input format
 		 */
 		EventTask(String task, String eventStartTime, String eventEndTime) {
 			this(task, eventStartTime, eventEndTime, false);
@@ -370,10 +383,14 @@ public abstract class Task {
 		/**
 		 * Creates an Event task with explicit times and completion state.
 		 *
-		 * @param task description text
-		 * @param eventStartTime start date string in input format
-		 * @param eventEndTime end date string in input format
-		 * @param isDone completion flag
+		 * @param task
+		 *            description text
+		 * @param eventStartTime
+		 *            start date string in input format
+		 * @param eventEndTime
+		 *            end date string in input format
+		 * @param isDone
+		 *            completion flag
 		 */
 		EventTask(String task, String eventStartTime, String eventEndTime, boolean isDone) {
 			super(task, isDone);

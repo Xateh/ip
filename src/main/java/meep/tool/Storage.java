@@ -7,25 +7,27 @@ import java.io.PrintWriter;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-/** Persistence layer for saving and loading {@link Task} lists from a text file. */
+/**
+ * Persistence layer for saving and loading {@link Task} lists from a text file.
+ */
 class Storage {
 	private static String FILE_PATH = "data/meep.txt";
 
 	/**
 	 * Saves tasks to the current file path.
 	 *
-	 * @param tasklist
+	 * @param tasks
 	 *            in-memory tasks
 	 * @param response
 	 *            buffer to append error messages
 	 * @return true if write succeeded
 	 */
-	public static boolean saveTasks(TaskList tasklist, StringBuilder response) {
-		assert tasklist != null : "tasklist must not be null";
+	public static boolean saveTasks(TaskList tasks, StringBuilder response) {
+		assert tasks != null : "tasks must not be null";
 		assert response != null : "response buffer must not be null";
 		assert FILE_PATH != null && !FILE_PATH.isEmpty() : "FILE_PATH must be configured";
 		try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH))) {
-			tasklist.iterateTasks(task -> writer.println(Task.saveString(task)));
+			tasks.iterateTasks(task -> writer.println(Task.saveString(task)));
 			return true;
 		} catch (IOException e) {
 			response.append("Error saving tasks.");
@@ -36,14 +38,14 @@ class Storage {
 	/**
 	 * Loads tasks from the current file path into the provided list.
 	 *
-	 * @param tasklist
+	 * @param tasks
 	 *            list to populate
 	 * @param response
 	 *            buffer to append error diagnostics
 	 * @return true if entire load succeeded; false if file missing or read error
 	 */
-	public static boolean loadTasks(TaskList tasklist, StringBuilder response) {
-		assert tasklist != null : "tasklist must not be null";
+	public static boolean loadTasks(TaskList tasks, StringBuilder response) {
+		assert tasks != null : "tasks must not be null";
 		assert response != null : "response buffer must not be null";
 		assert FILE_PATH != null && !FILE_PATH.isEmpty() : "FILE_PATH must be configured";
 		File file = new File(FILE_PATH);
@@ -58,7 +60,7 @@ class Storage {
 				try {
 					String line = fileScanner.nextLine();
 					Task task = Task.load(line);
-					tasklist.addTask(task);
+					tasks.addTask(task);
 				} catch (NoSuchElementException | IllegalStateException e) {
 					flag = false;
 				}

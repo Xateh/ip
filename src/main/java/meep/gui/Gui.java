@@ -8,7 +8,8 @@ import javafx.stage.Stage;
 /**
  * Minimal JavaFX demo UI for Meep that displays a simple greeting.
  *
- * <p>This class is not wired to the FXML chat UI; it serves as a lightweight
+ * <p>
+ * This class is not wired to the FXML chat UI; it serves as a lightweight
  * example to verify JavaFX setup.
  */
 public class Gui extends Application {
@@ -25,7 +26,11 @@ public class Gui extends Application {
 		stage.show(); // Render the stage.
 	}
 
-	public Gui(String filePath) { start(new Stage()); }
+	public Gui(String filePath) {
+		start(new Stage());
+	}
 
-	public Gui() { this(DEFAULT_FILE_PATH); }
+	public Gui() {
+		this(DEFAULT_FILE_PATH);
+	}
 }
