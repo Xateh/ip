@@ -26,9 +26,19 @@ class Storage {
 		assert tasks != null : "tasks must not be null";
 		assert response != null : "response buffer must not be null";
 		assert FILE_PATH != null && !FILE_PATH.isEmpty() : "FILE_PATH must be configured";
-		try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_PATH))) {
+		try {
+			File file = new File(FILE_PATH);
+			File parent = file.getParentFile();
+			if (parent != null && !parent.exists()) {
+				if (!parent.mkdirs()) {
+					response.append("Error saving tasks.");
+					return false;
+				}
+			}
+			try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
 			tasks.iterateTasks(task -> writer.println(Task.saveString(task)));
 			return true;
+			}
 		} catch (IOException e) {
 			response.append("Error saving tasks.");
 			return false;
@@ -66,7 +76,6 @@ class Storage {
 				}
 			}
 		} catch (IOException e) {
-			response.append(FILE_PATH).append(" not found");
 			flag = false;
 		}
 		return flag;

@@ -68,11 +68,13 @@ public abstract class Task {
 				case "D" :
 					return new DeadlineTask(parts[3], parts[4], parts[2].equals("1"));
 				case "E" :
-					return new EventTask(
-							parts[3],
-							parts[4].split("-")[0],
-							parts[4].split("-")[1],
-							parts[2].equals("1"));
+					String range = parts[4];
+					if (range.length() < 21) {
+						throw new ArrayIndexOutOfBoundsException("Invalid event time range");
+					}
+					String start = range.substring(0, 10);
+					String end = range.substring(range.length() - 10);
+					return new EventTask(parts[3], start, end, parts[2].equals("1"));
 				default :
 					throw new IllegalArgumentException("Unknown task type: " + parts[1]);
 			}
@@ -90,28 +92,29 @@ public abstract class Task {
 	 */
 	public static Pair<Task, Exception> buildTask(String task) {
 		try {
-			return task.startsWith("todo ")
-					? new Pair<>(new ToDoTask(task.substring(5).trim()), null)
-					: task.startsWith("deadline ")
-							? new Pair<>(new DeadlineTask(task.substring(9).trim()), null)
-							: task.startsWith("event ")
-									? new Pair<>(new EventTask(task.substring(6).trim()), null)
-									: new Pair<>(
-											null,
-											new Exception(
-													"Specify Task Description: "
-															+ task
-															+ " <task description>"));
+			String normalized = task.strip().replaceAll("\\s+", " ");
+			if (normalized.startsWith("todo ")) {
+				String desc = normalized.substring(5).trim();
+				if (desc.isEmpty()) {
+					throw new IllegalArgumentException("Task Description cannot be null or empty");
+				}
+				return new Pair<>(new ToDoTask(desc), null);
+			} else if (normalized.startsWith("deadline ")) {
+				return new Pair<>(new DeadlineTask(normalized.substring(9).trim()), null);
+			} else if (normalized.startsWith("event ")) {
+				return new Pair<>(new EventTask(normalized.substring(6).trim()), null);
+			}
+			return new Pair<>(null, new Exception("Specify Task Description: " + task + " <task description>"));
 		} catch (Exception e) {
 			return new Pair<>(null, e);
 		}
 	}
 
-	private Task(String description) {
+	protected Task(String description) {
 		this(description, false);
 	}
 
-	private Task(String description, boolean isDone) {
+	protected Task(String description, boolean isDone) {
 		assert inputDtfPattern != null && !inputDtfPattern.isEmpty() : "input pattern must be set";
 		assert outputDtfPattern != null && !outputDtfPattern.isEmpty()
 				: "output pattern must be set";
@@ -185,6 +188,11 @@ public abstract class Task {
 		return outputDtfPattern;
 	}
 
+	/** Package-private accessor for the input formatter used by tasks. */
+	static DateTimeFormatter getInputFormatter() {
+		return inputDtf;
+	}
+
 	/**
 	 * Determines if the task is due strictly before the given date (and not already
 	 * done).
@@ -213,279 +221,13 @@ public abstract class Task {
 		}
 	}
 
+	/**
+	 * Returns a human-readable representation including completion status and
+	 * description. Subclasses prepend their own type prefix (e.g., [T]/[D]/[E]).
+	 */
 	@Override
 	public String toString() {
-		return (isDone() ? "[X] " : "[ ] ") + getDescription();
-	}
-
-	/** Todo task with only a description. */
-	private static class ToDoTask extends Task {
-		/**
-		 * Creates a Todo task.
-		 *
-		 * @param task
-		 *            description text
-		 */
-		ToDoTask(String task) {
-			this(task, false);
-		}
-
-		/**
-		 * Creates a Todo task with explicit completion state.
-		 *
-		 * @param task
-		 *            description text
-		 * @param isDone
-		 *            completion flag
-		 */
-		ToDoTask(String task, boolean isDone) {
-			super(task, isDone);
-		}
-
-		/** Returns false as Todo tasks have no due date. */
-		@Override
-		public boolean isDue(String time) {
-			assert time != null : "time must not be null";
-			return false;
-		}
-
-		/** String form prefixed with [T]. */
-		@Override
-		public String toString() {
-			return "[T]" + super.toString();
-		}
-	}
-
-	/** Deadline task with a due date. */
-	private static class DeadlineTask extends Task {
-		private String deadline;
-
-		/**
-		 * Extracts the deadline value from a command string.
-		 *
-		 * @param task
-		 *            raw command
-		 * @return extracted deadline or empty string
-		 */
-		private static String extractDeadline(String task) {
-			for (String command : task.split("/")) {
-				if (command.startsWith("by")) {
-					return command.substring(3).trim();
-				}
-			}
-			return "";
-		}
-
-		/**
-		 * Creates a Deadline task from a raw command string containing "/by".
-		 *
-		 * @param task
-		 *            raw command string (e.g., "deadline desc /by yyyy-MM-dd")
-		 */
-		DeadlineTask(String task) {
-			this(task.split("/", 2)[0], extractDeadline(task));
-		}
-
-		/**
-		 * Creates a Deadline task with an explicit deadline.
-		 *
-		 * @param task
-		 *            description text
-		 * @param deadline
-		 *            date string in input format
-		 */
-		DeadlineTask(String task, String deadline) {
-			this(task, deadline, false);
-		}
-
-		/**
-		 * Creates a Deadline task with explicit deadline and completion state.
-		 *
-		 * @param task
-		 *            description text
-		 * @param deadline
-		 *            date string in input format
-		 * @param isDone
-		 *            completion flag
-		 */
-		DeadlineTask(String task, String deadline, boolean isDone) {
-			super(task, isDone);
-			if (deadline == null || deadline.trim().isEmpty()) {
-				throw new IllegalArgumentException(
-						"Deadline cannot be null or empty: Please specify deadline time with /by");
-			}
-			this.deadline = deadline;
-		}
-
-		/**
-		 * Returns the deadline date string.
-		 *
-		 * @return deadline
-		 */
-		public String getDeadline() {
-			assert deadline != null && !deadline.isEmpty() : "deadline must be initialized";
-			return deadline;
-		}
-
-		/** Determines if this deadline is due before the given date. */
-		@Override
-		public boolean isDue(String time) {
-			assert time != null : "time must not be null";
-			try {
-				return !isDone()
-						&& LocalDate.parse(time, inputDtf)
-								.isAfter(LocalDate.parse(getDeadline(), inputDtf));
-			} catch (Exception e) {
-				return false;
-			}
-		}
-
-		/** String form prefixed with [D] and printed deadline. */
-		@Override
-		public String toString() {
-			return "[D]" + super.toString() + " (by: " + printTime(getDeadline()) + ")";
-		}
-	}
-
-	/** Event task spanning a start and end date. */
-	private static class EventTask extends Task {
-		private String eventStartTime;
-		private String eventEndTime;
-
-		/**
-		 * Creates an Event task from a raw command string containing "/from" and "/to".
-		 *
-		 * @param task
-		 *            raw command string (e.g., "event desc /from yyyy-MM-dd /to
-		 *            yyyy-MM-dd")
-		 */
-		EventTask(String task) {
-			this(
-					task.split("/", 2)[0],
-					EventTask.extractStartTime(task),
-					EventTask.extractEndTime(task));
-		}
-
-		/**
-		 * Creates an Event task with explicit start and end times.
-		 *
-		 * @param task
-		 *            description text
-		 * @param eventStartTime
-		 *            start date string in input format
-		 * @param eventEndTime
-		 *            end date string in input format
-		 */
-		EventTask(String task, String eventStartTime, String eventEndTime) {
-			this(task, eventStartTime, eventEndTime, false);
-		}
-
-		/**
-		 * Creates an Event task with explicit times and completion state.
-		 *
-		 * @param task
-		 *            description text
-		 * @param eventStartTime
-		 *            start date string in input format
-		 * @param eventEndTime
-		 *            end date string in input format
-		 * @param isDone
-		 *            completion flag
-		 */
-		EventTask(String task, String eventStartTime, String eventEndTime, boolean isDone) {
-			super(task, isDone);
-			if (eventStartTime == null || eventStartTime.trim().isEmpty()) {
-				throw new IllegalArgumentException(
-						"Event start time cannot be null or empty: Please specify event start time"
-								+ " with /from");
-			}
-			if (eventEndTime == null || eventEndTime.trim().isEmpty()) {
-				throw new IllegalArgumentException(
-						"Event end time cannot be null or empty: Please specify event end time with"
-								+ " /to");
-			}
-
-			this.eventStartTime = eventStartTime;
-			this.eventEndTime = eventEndTime;
-		}
-
-		/**
-		 * Extracts the event start time from a command string.
-		 *
-		 * @param task
-		 *            raw command
-		 * @return extracted start time or empty string
-		 */
-		private static String extractStartTime(String task) {
-			for (String command : task.split("/")) {
-				if (command.startsWith("from")) {
-					return command.substring(5).trim();
-				}
-			}
-			return "";
-		}
-
-		/**
-		 * Extracts the event end time from a command string.
-		 *
-		 * @param task
-		 *            raw command
-		 * @return extracted end time or empty string
-		 */
-		private static String extractEndTime(String task) {
-			for (String command : task.split("/")) {
-				if (command.startsWith("to")) {
-					return command.substring(3).trim();
-				}
-			}
-			return "";
-		}
-
-		/**
-		 * Returns the event start date string.
-		 *
-		 * @return start date
-		 */
-		public String getEventStartTime() {
-			assert eventStartTime != null && !eventStartTime.isEmpty()
-					: "event start time must be initialized";
-			return eventStartTime;
-		}
-
-		/**
-		 * Returns the event end date string.
-		 *
-		 * @return end date
-		 */
-		public String getEventEndTime() {
-			assert eventEndTime != null && !eventEndTime.isEmpty()
-					: "event end time must be initialized";
-			return eventEndTime;
-		}
-
-		/** Determines if the event ends before the given date. */
-		@Override
-		public boolean isDue(String time) {
-			assert time != null : "time must not be null";
-			try {
-				return !isDone()
-						&& LocalDate.parse(time, inputDtf)
-								.isAfter(LocalDate.parse(getEventEndTime(), inputDtf));
-			} catch (Exception e) {
-				return false;
-			}
-		}
-
-		/** String form prefixed with [E] including printed start and end. */
-		@Override
-		public String toString() {
-			return "[E]"
-					+ super.toString()
-					+ " (from: "
-					+ printTime(getEventStartTime())
-					+ " to: "
-					+ printTime(getEventEndTime())
-					+ ")";
-		}
+        String status = isDone ? "[X]" : "[ ]";
+        return status + " " + description;
 	}
 }

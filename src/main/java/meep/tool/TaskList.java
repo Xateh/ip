@@ -97,6 +97,14 @@ class TaskList {
 		return tasks.stream();
 	}
 
+	/**
+	 * Checks if a task with the same identity text exists.
+	 */
+	public boolean contains(Task task) {
+		assert task != null : "task must not be null";
+		return tasks.stream().anyMatch(t -> t.toString().equals(task.toString()));
+	}
+
 	@FunctionalInterface
 	/** Functional callback for iterating tasks without indices. */
 	interface TaskAction {
