@@ -14,23 +14,23 @@ import javafx.stage.Stage;
  */
 public class Gui extends Application {
 
-	private static final String DEFAULT_FILE_PATH = "meep/example.txt";
+    private static final String DEFAULT_FILE_PATH = "meep/example.txt";
 
-	/** Configures and shows the primary JavaFX stage. */
-	@Override
-	public void start(Stage stage) {
-		Label helloWorld = new Label("Hello World!"); // Creating a new Label control
-		Scene scene = new Scene(helloWorld); // Setting the scene to be our Label
+    /** Configures and shows the primary JavaFX stage. */
+    @Override
+    public void start(Stage stage) {
+        Label helloWorld = new Label("Hello World!"); // Creating a new Label control
+        Scene scene = new Scene(helloWorld); // Setting the scene to be our Label
 
-		stage.setScene(scene); // Setting the stage to show our scene
-		stage.show(); // Render the stage.
-	}
+        stage.setScene(scene); // Setting the stage to show our scene
+        stage.show(); // Render the stage.
+    }
 
-	public Gui(String filePath) {
-		start(new Stage());
-	}
+    public Gui(String filePath) {
+        start(new Stage());
+    }
 
-	public Gui() {
-		this(DEFAULT_FILE_PATH);
-	}
+    public Gui() {
+        this(DEFAULT_FILE_PATH);
+    }
 }
