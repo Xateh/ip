@@ -18,7 +18,7 @@ public abstract class Task {
 	private static DateTimeFormatter outputDtf = DateTimeFormatter.ofPattern(outputDtfPattern);
 
 	private String description;
-	private boolean done;
+	private boolean isDone;
 
 	/**
 	 * Serializes a task to a pipe-delimited save string. Example: |T|0|desc|,
@@ -120,7 +120,7 @@ public abstract class Task {
 		}
 
 		this.description = description;
-		this.done = isDone;
+		this.isDone = isDone;
 	}
 
 	public String getDescription() {
@@ -138,17 +138,17 @@ public abstract class Task {
 	 * @return true if done
 	 */
 	public boolean isDone() {
-		return done;
+		return isDone;
 	}
 
 	/** Marks the task as completed. */
 	public void markDone() {
-		done = true;
+		isDone = true;
 	}
 
 	/** Marks the task as not completed. */
 	public void markNotDone() {
-		done = false;
+		isDone = false;
 	}
 
 	/**
