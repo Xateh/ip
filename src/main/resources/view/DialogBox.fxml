@@ -4,19 +4,42 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
 
-<fx:root alignment="TOP_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="400.0" stylesheets="@../css/dialog-box.css" type="javafx.scene.layout.HBox" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root alignment="BOTTOM_RIGHT" fillHeight="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="400.0" stylesheets="@../css/dialog-box.css" type="javafx.scene.layout.HBox" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
   <children>
-    <Label fx:id="dialog" minHeight="-Infinity" styleClass="dialog-label" text="Label" wrapText="true">
-         <HBox.margin>
-            <Insets left="7.0" right="7.0" />
-         </HBox.margin>
-         <padding>
+    <VBox fx:id="labelBox" alignment="TOP_RIGHT" fillWidth="true" HBox.hgrow="ALWAYS">
+      <children>
+        <Label fx:id="dialog" minHeight="-Infinity" minWidth="0.0" maxWidth="Infinity" styleClass="dialog-label" text="Label" wrapText="true">
+          <padding>
             <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
-         </padding></Label>
-    <ImageView fx:id="displayPicture" fitHeight="99.0" fitWidth="99.0" pickOnBounds="true" preserveRatio="true" />
+          </padding>
+        </Label>
+  <!-- No spacer needed; row height will follow label height -->
+      </children>
+      <HBox.margin>
+        <Insets left="7.0" right="7.0" />
+      </HBox.margin>
+    </VBox>
+    <StackPane fx:id="avatarContainer" styleClass="display-picture-container" prefWidth="88.0" prefHeight="88.0" minWidth="88.0" minHeight="88.0" maxWidth="88.0" maxHeight="88.0" alignment="BOTTOM_LEFT">
+      <children>
+        <ImageView fx:id="displayPicture" id="displayPicture" fitHeight="88.0" fitWidth="88.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
+          <clip>
+            <Circle centerX="44.0" centerY="44.0" radius="44.0" />
+          </clip>
+        </ImageView>
+        <!-- Subtle circular border overlay -->
+        <Circle centerX="44.0" centerY="44.0" radius="43.5" fill="transparent" stroke="#FFFFFFCC" strokeWidth="1.5" StackPane.alignment="BOTTOM_LEFT" />
+      </children>
+      <HBox.margin>
+        <Insets left="7.0" right="7.0" />
+      </HBox.margin>
+    </StackPane>
   </children>
   <padding>
-    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+    <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
   </padding>
 </fx:root>

@@ -12,6 +12,8 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 /**
  * Dialog box control with an image for the speaker and a text label for the
@@ -22,6 +24,10 @@ public class DialogBox extends HBox {
     private Label dialog;
     @FXML
     private ImageView displayPicture;
+    @FXML
+    private VBox labelBox;
+    @FXML
+    private StackPane avatarContainer;
 
     private DialogBox(String text, Image img) {
         try {
@@ -46,7 +52,18 @@ public class DialogBox extends HBox {
         ObservableList<Node> tmp = FXCollections.observableArrayList(this.getChildren());
         Collections.reverse(tmp);
         getChildren().setAll(tmp);
-        setAlignment(Pos.TOP_LEFT);
+        setAlignment(Pos.BOTTOM_LEFT);
+        // Mirror per-orientation alignments for Meep side
+        if (labelBox != null) {
+            labelBox.setAlignment(Pos.TOP_LEFT);
+        }
+        if (avatarContainer != null) {
+            avatarContainer.setAlignment(Pos.BOTTOM_RIGHT);
+            // Ensure all children (image and border) align to bottom-right in the stack
+            for (Node child : avatarContainer.getChildren()) {
+                StackPane.setAlignment(child, Pos.BOTTOM_RIGHT);
+            }
+        }
         dialog.getStyleClass().add("reply-label");
     }
 
