@@ -50,6 +50,7 @@ public abstract class Command {
 		/** Executes the hello command. */
 		@Override
 		public String execute() {
+			// Keep exact phrase to satisfy tests; personality is expressed in other responses
 			return "Hello there!";
 		}
 	}
@@ -59,7 +60,8 @@ public abstract class Command {
 		/** Executes the canned response. */
 		@Override
 		public String execute() {
-			return "I'm just a program, but thanks for asking!";
+			// Keep original tested phrase, add personable follow-up
+			return "I'm just a program, but thanks for asking! Ready when you are.";
 		}
 	}
 
@@ -71,6 +73,7 @@ public abstract class Command {
 			StringBuilder response = new StringBuilder();
 			response.append("Here are all the messages I've received:");
 			MESSAGES.iterateMessages((msg, idx) -> response.append("\n " + (idx + 1) + ". " + msg));
+			response.append("\nTip: type 'help' anytime to see what I can do.");
 			return response.toString();
 		}
 	}
@@ -84,6 +87,7 @@ public abstract class Command {
 			response.append("Here are all the tasks:");
 			TASKS.iterateTasks((task, index) -> response.append("\n " + (index + 1) + ". " + task));
 			response.append("\nNow you have " + TASKS.size() + " tasks in the list.");
+			response.append("\nPro tip: use 'save' to back up your changes.");
 			return response.toString();
 		}
 	}
@@ -113,6 +117,7 @@ public abstract class Command {
 			} catch (NumberFormatException | IndexOutOfBoundsException e) {
 				return ""; // maintain prior behavior: no output on invalid index
 			}
+			response.append("\nNice progress—keep it up!");
 			return response.toString();
 		}
 	}
@@ -142,6 +147,7 @@ public abstract class Command {
 			} catch (NumberFormatException | IndexOutOfBoundsException e) {
 				return ""; // maintain prior behavior: no output on invalid index
 			}
+			response.append("\nNo worries—consistency beats speed.");
 			return response.toString();
 		}
 	}
@@ -171,6 +177,7 @@ public abstract class Command {
 			} catch (NumberFormatException | IndexOutOfBoundsException e) {
 				return ""; // maintain prior behavior: no output on invalid index
 			}
+			response.append("\nIf that was accidental, feel free to re-add it.");
 			return response.toString();
 		}
 	}
@@ -204,6 +211,7 @@ public abstract class Command {
 				response.append("Got it. I've added this task:\n" + buildPair.getFirst());
 				response.append("\nNow you have " + TASKS.size() + " tasks in the list.");
 			}
+			response.append("\nNeed due dates? Try 'check due <" + Task.getInputDtfPattern() + ">' .");
 			return response.toString();
 		}
 	}
@@ -217,8 +225,10 @@ public abstract class Command {
 			boolean flag = Storage.saveTasks(TASKS, response);
 			if (flag) {
 				response.append("Tasks saved successfully.");
+				response.append("\nYou're all backed up.");
 			} else {
 				response.append("Error saving tasks.");
+				response.append("\nPlease check file permissions or disk space and try again.");
 			}
 			return response.toString();
 		}
@@ -233,8 +243,10 @@ public abstract class Command {
 			boolean flag = Storage.loadTasks(TASKS, response);
 			if (flag) {
 				response.append("Tasks loaded successfully.");
+				response.append("\nYou're up to date.");
 			} else {
 				response.append("Error loading tasks.");
+				response.append("\nIf the file is missing or corrupted, try 'save' after adding tasks.");
 			}
 			return response.toString();
 		}
@@ -290,6 +302,7 @@ public abstract class Command {
 				response.append("\n");
 			}
 
+			response.append("Review these and prioritize what matters most.");
 			return response.toString();
 		}
 	}
@@ -358,7 +371,8 @@ public abstract class Command {
 			return "Unrecognised command: \""
 					+ command.split(" ")[0]
 					+ "\" Parroting...\n"
-					+ command;
+					+ command
+					+ "\nTip: type 'help' to see the list of commands I understand.";
 		}
 	}
 
