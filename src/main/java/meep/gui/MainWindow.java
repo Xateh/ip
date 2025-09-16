@@ -24,16 +24,29 @@ public class MainWindow extends AnchorPane {
     private TextField userInput;
     @FXML
     private Button sendButton;
+    // Background image is now applied via CSS on the root; no FXML image nodes
+    // needed
 
     private Meep meep;
     private Stage stage;
 
-    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
-    private Image meepImage = new Image(this.getClass().getResourceAsStream("/images/DaMeep.png"));
+    private Image userImage;
+    private Image meepHappyImage;
+    private Image meepSadImage;
+    private Image meepTalkImage;
+    private Image meepSmileImage;
 
     @FXML
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+        // Load images with graceful fallbacks
+        userImage = loadFirstAvailable("/images/avatar.jpg", "/images/DaUser.png");
+        meepHappyImage = loadFirstAvailable("/images/happy_robot.jpg", "/images/DaMeep.png");
+        meepSadImage = loadFirstAvailable("/images/sad_robot.jpg", "/images/DaMeep.png");
+        meepTalkImage = loadFirstAvailable("/images/talk_robot.jpg", "/images/DaMeep.png");
+        meepSmileImage = loadFirstAvailable("/images/smile_robot.jpg", "/images/DaMeep.png");
+
+        // Background handled by CSS; nothing to wire here
     }
 
     /**
@@ -73,7 +86,9 @@ public class MainWindow extends AnchorPane {
                     .addAll(
                             DialogBox.getUserDialog(input, userImage),
                             DialogBox.getMeepDialog(
-                                    "Bye. Hope to see you again soon!", meepImage, "Goodbye"));
+                                    "Bye. Hope to see you again soon!",
+                                    meepImageForType("Goodbye"),
+                                    "Goodbye"));
             userInput.clear();
             userInput.setDisable(true);
             sendButton.setDisable(true);
@@ -119,7 +134,65 @@ public class MainWindow extends AnchorPane {
                 .addAll(
                         DialogBox.getUserDialog(input, userImage),
                         DialogBox.getMeepDialog(
-                                response.getFirst(), meepImage, response.getSecond()));
+                                response.getFirst(),
+                                meepImageForType(response.getSecond()),
+                                response.getSecond()));
         userInput.clear();
+    }
+
+    /** Returns the most suitable Meep avatar image for a given command type. */
+    private Image meepImageForType(String commandType) {
+        if (commandType == null) {
+            return meepHappyImage != null ? meepHappyImage : fallbackMeep();
+        }
+        switch (commandType) {
+            case "DeleteCommand" :
+            case "UnknownCommand" :
+            case "Error" :
+                return coalesce(meepSadImage, fallbackMeep());
+            case "HelpCommand" :
+                return coalesce(meepTalkImage, fallbackMeep());
+            case "MarkCommand" :
+            case "UnmarkCommand" :
+            case "AddMessageCommand" :
+            case "AddTaskCommand" :
+            case "SaveCommand" :
+            case "LoadCommand" :
+                return coalesce(meepSmileImage, fallbackMeep());
+            case "Goodbye" :
+            case "ByeCommand" :
+                return coalesce(meepSmileImage, fallbackMeep());
+            default :
+                return coalesce(meepHappyImage, fallbackMeep());
+        }
+    }
+
+    /** Attempts to load the first available resource from the provided paths. */
+    private Image loadFirstAvailable(String... resourcePaths) {
+        for (String p : resourcePaths) {
+            try {
+                var stream = this.getClass().getResourceAsStream(p);
+                if (stream != null) {
+                    return new Image(stream);
+                }
+            } catch (Exception ignored) {
+                // try next
+            }
+        }
+        return null;
+    }
+
+    /** Returns DaMeep.png fallback image, guaranteed non-null when available. */
+    private Image fallbackMeep() {
+        Image img = loadFirstAvailable("/images/DaMeep.png");
+        if (img == null) {
+            // As an absolute last resort, reuse any available user image
+            return userImage;
+        }
+        return img;
+    }
+
+    private Image coalesce(Image preferred, Image fallback) {
+        return preferred != null ? preferred : fallback;
     }
 }

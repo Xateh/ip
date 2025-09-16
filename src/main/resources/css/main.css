@@ -1,35 +1,98 @@
 .root {
-    main-color: rgb(237, 255, 242);       /* JavaFX looked-up color */
-    background-color: main-color; /* standard */
-    -fx-background-color: main-color;     /* JavaFX */
+    /* Soft light gradient base */
+    background-color: linear-gradient(to bottom, #fdfefe, #f7fbff); /* standard */
+    -fx-background-color: linear-gradient(to bottom, #fdfefe, #f7fbff); /* JavaFX */
+
+    /* Background image applied via CSS, scaled to fit window height */
+    background-image: url("/images/bg_img.jpg"); /* standard */
+    -fx-background-image: url("/images/bg_img.jpg"); /* JavaFX */
+
+    /* Cover: fill window, preserve ratio (may crop) */
+    background-size: cover; /* standard */
+    -fx-background-size: cover; /* JavaFX */
+
+    /* Center and no-repeat */
+    background-repeat: no-repeat; /* standard */
+    -fx-background-repeat: no-repeat; /* JavaFX */
+    background-position: center center; /* standard */
+    -fx-background-position: center center; /* JavaFX */
 }
 
 .text-field {
-    background-color: #d9ffe2; /* standard */
-    -fx-background-color: #d9ffe2; /* JavaFX */
-    font: 20px "Arial"; /* standard */
-    -fx-font: 20px "Arial"; /* JavaFX */
+    background-color: #ffffff; /* standard */
+    -fx-background-color: #ffffff; /* JavaFX */
+    border-color: #cfd9e3; /* standard */
+    -fx-border-color: #cfd9e3; /* JavaFX */
+    border-width: 1.5px; /* standard */
+    -fx-border-width: 1.5px; /* JavaFX */
+    border-radius: 24px; /* standard outer radius */
+    -fx-background-radius: 22, 22, 22; /* round all background layers */
+    -fx-background-insets: 0, 0, 0; /* prevent inner square layers */
+    -fx-border-radius: 22, 22, 22; /* round all border layers */
+    border-radius: 22px; /* standard compatibility */
+    -fx-border-insets: 0, 0, 0; /* prevent inner square border layers */
+    padding: 6px 12px; /* standard */
+    -fx-padding: 6px 12px; /* JavaFX */
+    font: 16px "Arial"; /* standard */
+    -fx-font: 16px "Arial"; /* JavaFX */
+}
+
+.text-field:focused {
+    border-color: #9ec5fe; /* standard */
+    -fx-border-color: #9ec5fe; /* JavaFX */
+    -fx-background-radius: 22, 22, 22;
+    border-radius: 24px;
+    -fx-background-insets: 0, 0, 0;
+    -fx-border-radius: 22, 22, 22;
+    -fx-border-insets: 0, 0, 0;
+    -fx-focus-color: transparent; /* remove default blue glow */
+    -fx-faint-focus-color: transparent; /* remove faint ring */
+    -fx-effect: dropshadow(gaussian, rgba(159, 201, 255, 0.35), 8, 0.3, 0, 0);
 }
 
 .button {
-    background-color: mediumspringgreen; /* standard */
-    -fx-background-color: mediumspringgreen; /* JavaFX */
-    font: italic bold 16px "Arial"; /* standard */
-    -fx-font: italic bold 16px "Arial"; /* JavaFX */
+    background-color: #e6f1ff; /* standard */
+    -fx-background-color: #e6f1ff; /* JavaFX */
+    border-color: #9ec5fe; /* standard */
+    -fx-border-color: #9ec5fe; /* JavaFX */
+    border-width: 1.5px; /* standard */
+    -fx-border-width: 1.5px; /* JavaFX */
+    border-radius: 24px; /* standard outer radius */
+    -fx-background-radius: 22, 22, 22; /* JavaFX: all layers rounded */
+    -fx-background-insets: 0, 0, 0; /* prevent square inset layers */
+    -fx-border-radius: 22, 22, 22;
+    border-radius: 22px;
+    -fx-border-insets: 0, 0, 0;
+    font: bold 14px "Arial"; /* standard */
+    -fx-font: bold 14px "Arial"; /* JavaFX */
+    -fx-text-fill: #0b3d91;
+    padding: 6px 12px; /* standard */
+    -fx-padding: 6px 12px; /* JavaFX */
+    -fx-focus-color: transparent; /* remove default focus ring */
+    -fx-faint-focus-color: transparent;
+    -fx-background-insets: 0, 0, 0;
 }
 
 .button:hover {
-    background-color: cyan; /* standard */
-    -fx-background-color: cyan; /* JavaFX */
-    font-size: 18px; /* standard */
-    -fx-font-size: 18px; /* JavaFX */
+    border-radius: 24px;
+    background-color: #d9eaff; /* standard */
+    -fx-background-color: #d9eaff; /* JavaFX */
+    -fx-background-insets: 0, 0, 0;
+    -fx-background-radius: 22, 22, 22;
+    border-radius: 22px;
+    -fx-border-radius: 22, 22, 22;
+    -fx-border-insets: 0, 0, 0;
 }
 
 .button:pressed {
-    background-color: orange; /* standard */
-    -fx-background-color: orange; /* JavaFX */
-    font-size: 20px; /* standard */
-    -fx-font-size: 20px; /* JavaFX */
+    border-radius: 24px;
+    background-color: #cbe0ff; /* standard */
+    -fx-background-color: #cbe0ff; /* JavaFX */
+    -fx-background-insets: 0, 0, 0;
+    -fx-background-radius: 22, 22, 22;
+    border-radius: 22px;
+    -fx-border-radius: 22, 22, 22;
+    -fx-border-insets: 0, 0, 0;
 }
 
 .scroll-pane,
@@ -41,13 +104,13 @@
 .scroll-bar {
     font-size: 10px;  /* standard: visual width of scroll bar track */
     -fx-font-size: 10px;  /* JavaFX */
-    background-color: rgb(237, 255, 242); /* standard */
-    -fx-background-color: main-color; /* JavaFX looked-up color */
+    background-color: #f7fbff; /* standard */
+    -fx-background-color: #f7fbff; /* JavaFX */
 }
 
 .scroll-bar .thumb {
-    background-color: #ff9cb4; /* standard */
-    -fx-background-color: #ff9cb4; /* JavaFX */
+    background-color: #b0d6ff; /* standard */
+    -fx-background-color: #b0d6ff; /* JavaFX */
     border-radius: 1em; /* standard */
     -fx-background-radius: 1em; /* JavaFX */
 }
@@ -58,5 +121,11 @@
     -fx-pref-height: 0;
     opacity: 0; /* standard */
     -fx-opacity: 0; /* JavaFX */
+}
+
+/* Optional: If you want a subtle global tint over the background, apply this style to the root in FXML */
+.frosted-tint {
+    background-color: rgba(255, 255, 255, 0.18); /* standard */
+    -fx-background-color: rgba(255, 255, 255, 0.18); /* JavaFX */
 }
 

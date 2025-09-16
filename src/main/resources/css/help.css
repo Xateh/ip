@@ -1,21 +1,28 @@
 .help-root {
-    padding: 12px; /* standard */
-    -fx-padding: 12px; /* JavaFX */
+    padding: 16px; /* standard */
+    -fx-padding: 16px; /* JavaFX */
 }
 
 .help-header {
-    font-size: 16px; /* standard */
-    -fx-font-size: 16px; /* JavaFX */
+    font-size: 18px; /* standard */
+    -fx-font-size: 18px; /* JavaFX */
     font-weight: bold; /* standard */
     -fx-font-weight: bold; /* JavaFX */
 }
 
 .help-entry {
-    padding: 6px; /* standard */
-    -fx-padding: 6px; /* JavaFX */
-    background-color: #f6f8fa; /* standard */
-    -fx-background-color: #f6f8fa; /* JavaFX */
-    -fx-background-radius: 6px;
+    padding: 10px 12px; /* standard */
+    -fx-padding: 10px 12px; /* JavaFX */
+    background-color: #f8fbff; /* standard */
+    -fx-background-color: #f8fbff; /* JavaFX */
+    -fx-background-radius: 10px;
+    border-color: #e1e8f0; /* standard */
+    -fx-border-color: #e1e8f0; /* JavaFX */
+    border-width: 1px; /* standard */
+    -fx-border-width: 1px; /* JavaFX */
+    border-radius: 10px; /* standard */
+    -fx-border-radius: 10px; /* JavaFX */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 6, 0.2, 0, 1);
     /* Auto choose white/black text depending on the background brightness */
     -fx-text-fill: ladder(-fx-background-color, white 49%, black 50%);
 }
