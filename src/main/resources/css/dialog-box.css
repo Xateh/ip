@@ -10,6 +10,8 @@
 .reply-label {
     -fx-background-color: linear-gradient(to bottom right, #f0f8ff, #e6e6fa);
     -fx-border-color: #dcdcdc;
+    border-color: #dcdcdc;
+    -fx-border-width: 1px;
     -fx-background-radius: 1em 1em 1em 0;
     -fx-border-radius: 1em 1em 1em 0;
     -fx-text-fill: black;
