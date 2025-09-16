@@ -36,8 +36,8 @@ class Storage {
 				}
 			}
 			try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
-			tasks.iterateTasks(task -> writer.println(Task.saveString(task)));
-			return true;
+				tasks.iterateTasks(task -> writer.println(Task.saveString(task)));
+				return true;
 			}
 		} catch (IOException e) {
 			response.append("Error saving tasks.");
