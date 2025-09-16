@@ -104,7 +104,9 @@ public abstract class Task {
 			} else if (normalized.startsWith("event ")) {
 				return new Pair<>(new EventTask(normalized.substring(6).trim()), null);
 			}
-			return new Pair<>(null, new Exception("Specify Task Description: " + task + " <task description>"));
+			return new Pair<>(
+					null,
+					new Exception("Specify Task Description: " + task + " <task description>"));
 		} catch (Exception e) {
 			return new Pair<>(null, e);
 		}
@@ -227,7 +229,7 @@ public abstract class Task {
 	 */
 	@Override
 	public String toString() {
-        String status = isDone ? "[X]" : "[ ]";
-        return status + " " + description;
+		String status = isDone ? "[X]" : "[ ]";
+		return status + " " + description;
 	}
 }

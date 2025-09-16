@@ -42,7 +42,9 @@ public class MainWindow extends AnchorPane {
 	}
 
 	/** Injects the primary stage so we can close the app gracefully. */
-	public void setStage(Stage s) { this.stage = s; }
+	public void setStage(Stage s) {
+		this.stage = s;
+	}
 
 	/**
 	 * Creates two dialog boxes, one echoing user input and the other containing
@@ -66,13 +68,15 @@ public class MainWindow extends AnchorPane {
 			userInput.setDisable(true);
 			sendButton.setDisable(true);
 			PauseTransition delay = new PauseTransition(Duration.seconds(1.5));
-			delay.setOnFinished(e -> {
-				try {
-					if (stage != null) stage.close();
-				} finally {
-					Platform.exit();
-				}
-			});
+			delay.setOnFinished(
+					e -> {
+						try {
+							if (stage != null)
+								stage.close();
+						} finally {
+							Platform.exit();
+						}
+					});
 			delay.play();
 			return;
 		}
@@ -87,13 +91,15 @@ public class MainWindow extends AnchorPane {
 			userInput.setDisable(true);
 			sendButton.setDisable(true);
 			PauseTransition delay = new PauseTransition(Duration.seconds(1.5));
-			delay.setOnFinished(e -> {
-				try {
-					if (stage != null) stage.close();
-				} finally {
-					Platform.exit();
-				}
-			});
+			delay.setOnFinished(
+					e -> {
+						try {
+							if (stage != null)
+								stage.close();
+						} finally {
+							Platform.exit();
+						}
+					});
 			delay.play();
 		}
 		dialogContainer

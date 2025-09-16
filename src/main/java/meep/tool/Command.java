@@ -50,7 +50,8 @@ public abstract class Command {
 		/** Executes the hello command. */
 		@Override
 		public String execute() {
-			// Keep exact phrase to satisfy tests; personality is expressed in other responses
+			// Keep exact phrase to satisfy tests; personality is expressed in other
+			// responses
 			return "Hello there!";
 		}
 	}
@@ -211,7 +212,8 @@ public abstract class Command {
 				response.append("Got it. I've added this task:\n" + buildPair.getFirst());
 				response.append("\nNow you have " + TASKS.size() + " tasks in the list.");
 			}
-			response.append("\nNeed due dates? Try 'check due <" + Task.getInputDtfPattern() + ">' .");
+			response.append(
+					"\nNeed due dates? Try 'check due <" + Task.getInputDtfPattern() + ">' .");
 			return response.toString();
 		}
 	}
@@ -246,7 +248,8 @@ public abstract class Command {
 				response.append("\nYou're up to date.");
 			} else {
 				response.append("Error loading tasks.");
-				response.append("\nIf the file is missing or corrupted, try 'save' after adding tasks.");
+				response.append(
+						"\nIf the file is missing or corrupted, try 'save' after adding tasks.");
 			}
 			return response.toString();
 		}
