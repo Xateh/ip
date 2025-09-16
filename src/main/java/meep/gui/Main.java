@@ -17,26 +17,26 @@ import meep.ui.Meep;
  */
 public class Main extends Application {
 
-	private Meep meep = new Meep();
+    private Meep meep = new Meep();
 
-	@Override
-	public void start(Stage stage) {
-		try {
-			stage.setMinHeight(220);
-			stage.setMinWidth(417);
+    @Override
+    public void start(Stage stage) {
+        try {
+            stage.setMinHeight(220);
+            stage.setMinWidth(417);
 
-			FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
-			AnchorPane ap = fxmlLoader.load();
-			Scene scene = new Scene(ap);
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
+            AnchorPane ap = fxmlLoader.load();
+            Scene scene = new Scene(ap);
 
-			stage.setScene(scene);
-			stage.setTitle("Meep");
-			MainWindow controller = fxmlLoader.getController();
-			controller.setMeep(meep); // inject the Meep instance
-			controller.setStage(stage); // provide stage for graceful shutdown
-			stage.show();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+            stage.setScene(scene);
+            stage.setTitle("Meep");
+            MainWindow controller = fxmlLoader.getController();
+            controller.setMeep(meep); // inject the Meep instance
+            controller.setStage(stage); // provide stage for graceful shutdown
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

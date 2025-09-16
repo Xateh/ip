@@ -114,7 +114,7 @@ spotless {
         eclipse().configFile('config/spotless/eclipse-java-formatter.xml')
         trimTrailingWhitespace()
         endWithNewline()
-        indentWithTabs(4)
+        indentWithSpaces(4)
     }
 }
 

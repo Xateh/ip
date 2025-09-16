@@ -9,115 +9,115 @@ import java.util.stream.Stream;
  * iteration helpers.
  */
 class MessageList {
-	private final ArrayList<Message> messages = new ArrayList<>();
+    private final ArrayList<Message> messages = new ArrayList<>();
 
-	/**
-	 * Adds a message by content, creating a {@link Message} with current timestamp.
-	 *
-	 * @param message
-	 *            content
-	 * @return the string representation of the added message
-	 */
-	public String addMessage(String message) {
-		assert message != null : "message must not be null";
-		return addMessage(new Message(message));
-	}
+    /**
+     * Adds a message by content, creating a {@link Message} with current timestamp.
+     *
+     * @param message
+     *            content
+     * @return the string representation of the added message
+     */
+    public String addMessage(String message) {
+        assert message != null : "message must not be null";
+        return addMessage(new Message(message));
+    }
 
-	/**
-	 * Adds an existing message object to the list.
-	 *
-	 * @param message
-	 *            message instance
-	 * @return the string representation of the added message
-	 */
-	public String addMessage(Message message) {
-		assert message != null : "message must not be null";
-		messages.add(message);
-		return message.toString();
-	}
+    /**
+     * Adds an existing message object to the list.
+     *
+     * @param message
+     *            message instance
+     * @return the string representation of the added message
+     */
+    public String addMessage(Message message) {
+        assert message != null : "message must not be null";
+        messages.add(message);
+        return message.toString();
+    }
 
-	/**
-	 * Removes and returns the message at an index.
-	 *
-	 * @param index
-	 *            0-based index
-	 * @return removed message
-	 */
-	public Message removeMessage(int index) {
-		return messages.remove(index);
-	}
+    /**
+     * Removes and returns the message at an index.
+     *
+     * @param index
+     *            0-based index
+     * @return removed message
+     */
+    public Message removeMessage(int index) {
+        return messages.remove(index);
+    }
 
-	/**
-	 * Clears all messages.
-	 *
-	 * @return true after clearing
-	 */
-	public boolean clearMessages() {
-		messages.clear();
-		return true;
-	}
+    /**
+     * Clears all messages.
+     *
+     * @return true after clearing
+     */
+    public boolean clearMessages() {
+        messages.clear();
+        return true;
+    }
 
-	/**
-	 * Returns the number of messages.
-	 *
-	 * @return size of the list
-	 */
-	public int size() {
-		return messages.size();
-	}
+    /**
+     * Returns the number of messages.
+     *
+     * @return size of the list
+     */
+    public int size() {
+        return messages.size();
+    }
 
-	/**
-	 * Iterates over messages with a simple action.
-	 *
-	 * @param action
-	 *            callback invoked for each message
-	 */
-	public void iterateMessages(MessageAction action) {
-		assert action != null : "action must not be null";
-		messages.forEach(action::apply);
-	}
+    /**
+     * Iterates over messages with a simple action.
+     *
+     * @param action
+     *            callback invoked for each message
+     */
+    public void iterateMessages(MessageAction action) {
+        assert action != null : "action must not be null";
+        messages.forEach(action::apply);
+    }
 
-	/**
-	 * Iterates over messages with index and message.
-	 *
-	 * @param action
-	 *            callback invoked for each (message, index)
-	 */
-	public void iterateMessages(IndexMessageAction action) {
-		assert action != null : "action must not be null";
-		IntStream.range(0, messages.size()).forEach(i -> action.apply(messages.get(i), i));
-	}
+    /**
+     * Iterates over messages with index and message.
+     *
+     * @param action
+     *            callback invoked for each (message, index)
+     */
+    public void iterateMessages(IndexMessageAction action) {
+        assert action != null : "action must not be null";
+        IntStream.range(0, messages.size()).forEach(i -> action.apply(messages.get(i), i));
+    }
 
-	/**
-	 * Returns a sequential stream over the messages.
-	 *
-	 * @return stream of messages
-	 */
-	public Stream<Message> stream() {
-		return messages.stream();
-	}
+    /**
+     * Returns a sequential stream over the messages.
+     *
+     * @return stream of messages
+     */
+    public Stream<Message> stream() {
+        return messages.stream();
+    }
 
-	@FunctionalInterface
-	interface MessageAction {
-		/**
-		 * Applies an action to a message.
-		 *
-		 * @param message
-		 *            the message
-		 */
-		void apply(Message message);
-	}
+    @FunctionalInterface
+    interface MessageAction {
+        /**
+         * Applies an action to a message.
+         *
+         * @param message
+         *            the message
+         */
+        void apply(Message message);
+    }
 
-	@FunctionalInterface
-	interface IndexMessageAction {
-		/**
-		 * Applies an action to a message with its position.
-		 *
-		 * @param message
-		 *            the message
-		 * @param index
-		 *            0-based index
-		 */
-		void apply(Message message, int index);
-	}
+    @FunctionalInterface
+    interface IndexMessageAction {
+        /**
+         * Applies an action to a message with its position.
+         *
+         * @param message
+         *            the message
+         * @param index
+         *            0-based index
+         */
+        void apply(Message message, int index);
+    }
 }
