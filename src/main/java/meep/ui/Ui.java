@@ -22,7 +22,11 @@ public class Ui {
         scanner = newScanner;
     }
 
-    /** Reads a single line command from standard input. */
+    /**
+     * Reads a single line command from standard input.
+     *
+     * @return the raw line read from standard input
+     */
     public static String readCommand() {
         assert scanner != null : "scanner must be initialized";
         String command = scanner.nextLine();

@@ -18,6 +18,8 @@ public class Parser {
      *
      * @param message
      *            user input
+     * @return the constructed {@link Command} that was executed; may be null for
+     *         unknown inputs
      */
     public static Command parse(String message) {
         assert message != null : "input message must not be null";
@@ -38,6 +40,10 @@ public class Parser {
     /**
      * Parses a command without executing or printing any response; still records
      * the message.
+     *
+     * @param message
+     *            raw user input
+     * @return the constructed {@link Command} without side-effect printing
      */
     public static Command parseQuiet(String message) {
         assert message != null : "input message must not be null";

@@ -36,12 +36,22 @@ public class MainWindow extends AnchorPane {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
     }
 
-    /** Injects the Meep instance */
+    /**
+     * Injects the Meep instance.
+     *
+     * @param m
+     *            the Meep backend used by the GUI
+     */
     public void setMeep(Meep m) {
         meep = m;
     }
 
-    /** Injects the primary stage so we can close the app gracefully. */
+    /**
+     * Injects the primary stage so we can close the app gracefully.
+     *
+     * @param s
+     *            the primary JavaFX stage
+     */
     public void setStage(Stage s) {
         this.stage = s;
     }
@@ -71,8 +81,9 @@ public class MainWindow extends AnchorPane {
             delay.setOnFinished(
                     e -> {
                         try {
-                            if (stage != null)
+                            if (stage != null) {
                                 stage.close();
+                            }
                         } finally {
                             Platform.exit();
                         }
@@ -94,8 +105,9 @@ public class MainWindow extends AnchorPane {
             delay.setOnFinished(
                     e -> {
                         try {
-                            if (stage != null)
+                            if (stage != null) {
                                 stage.close();
+                            }
                         } finally {
                             Platform.exit();
                         }

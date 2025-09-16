@@ -16,8 +16,9 @@ public abstract class Command {
     protected static final TaskList TASKS = new TaskList();
 
     /**
-     * Executes the command and returns the response text. Return an empty string if
-     * there is nothing to print.
+     * Executes the command and returns the response text.
+     *
+     * @return the response text; may be empty if there is nothing to print
      */
     public abstract String execute();
 
