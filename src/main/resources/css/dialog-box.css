@@ -1,44 +1,28 @@
-.label {
-    background-color: linear-gradient(to bottom right, #00ffbf, #00ddff); /* standard */
-    -fx-background-color: linear-gradient(to bottom right, #00ffbf, #00ddff);
-    border-color: #d55e00 #009e73 #cc79a7 #0072b2; /* standard */
-    -fx-border-color: #d55e00 #009e73 #cc79a7 #0072b2;
-    border-width: 2px; /* standard */
-    -fx-border-width: 2px;
-    padding: 6px; /* standard */
-    -fx-padding: 6px;
-    -fx-border-insets: 0px 7px 0px 7px;
-    -fx-background-insets: 0px 7px 0px 7px;
+.dialog-label {
+    -fx-background-color: linear-gradient(to bottom right, #00bfff, #1e90ff);
+    -fx-border-color: #1e90ff;
+    -fx-border-width: 1px;
     -fx-background-radius: 1em 1em 0 1em;
-    border-radius: 1em 1em 0 1em; /* standard */
     -fx-border-radius: 1em 1em 0 1em;
-    /* Auto choose white/black text depending on the looked-up bg color */
-    -fx-text-fill: ladder(-fx-background-color, white 49%, black 50%);
+    -fx-text-fill: white;
 }
 
 .reply-label {
+    -fx-background-color: linear-gradient(to bottom right, #f0f8ff, #e6e6fa);
+    -fx-border-color: #dcdcdc;
     -fx-background-radius: 1em 1em 1em 0;
-    border-radius: 1em 1em 1em 0; /* standard */
     -fx-border-radius: 1em 1em 1em 0;
+    -fx-text-fill: black;
+}
+
+.error-label {
+    -fx-background-color: linear-gradient(to bottom right, #ff6347, #ff4500);
+    -fx-border-color: #dc143c;
+    -fx-text-fill: white;
 }
 
 #displayPicture {
-    /* Shadow effect on image. */
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0.5, 5, 5);
-
-    /* Change size of image. */
-    -fx-scale-x: 1;
-    -fx-scale-y: 1;
-
-    /* Rotate image clockwise by degrees. */
-    rotate: 0; /* standard */
-    -fx-rotate: 0;
-}
-
-.reply-label {
-    -fx-background-radius: 1em 1em 1em 0;
-    border-radius: 1em 1em 1em 0; /* standard */
-    -fx-border-radius: 1em 1em 1em 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 10, 0.3, 3, 3);
 }
 
 .add-label {
