@@ -1,9 +1,10 @@
 plugins {
     id 'java'
     id 'application'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'com.diffplug.spotless' version '6.25.0'
     id 'checkstyle'
+    id 'jacoco'
 }
 
 repositories {
@@ -48,6 +49,36 @@ test {
         showCauses true
         showStackTraces true
         showStandardStreams = false
+    }
+}
+
+jacoco {
+    toolVersion = '0.8.11'
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('reports/jacoco/html')
+    }
+}
+
+jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+    violationRules {
+        rule {
+            limit {
+                counter = 'INSTRUCTION'
+                value = 'COVEREDRATIO'
+                minimum = 0.50
+            }
+        }
     }
 }
 
@@ -105,7 +136,7 @@ tasks.withType(Checkstyle).configureEach {
 
 // Enforce formatting on CI via the standard 'check' lifecycle
 tasks.named('check') {
-    dependsOn 'spotlessCheck', 'checkstyleMain', 'checkstyleTest'
+    dependsOn 'spotlessCheck', 'checkstyleMain', 'checkstyleTest', 'jacocoTestReport', 'jacocoTestCoverageVerification'
 }
 
 tasks.register('compileRun') {
