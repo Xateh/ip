@@ -21,9 +21,11 @@ public class Parser {
 	 */
 	public static Command parse(String message) {
 		assert message != null : "input message must not be null";
-		// record message silently
+		// Normalize whitespace and trim to tolerate extra/multiple spaces
+		String normalized = message.strip().replaceAll("\\s+", " ");
+		// record message silently (store as user typed)
 		new Command.AddMessageCommand(message).execute();
-		Command command = buildCommand(message, /* interactive */ true);
+		Command command = buildCommand(normalized, /* interactive */ true);
 		if (command != null) {
 			String response = command.execute();
 			if (!response.isEmpty()) {
@@ -39,9 +41,11 @@ public class Parser {
 	 */
 	public static Command parseQuiet(String message) {
 		assert message != null : "input message must not be null";
-		// record message silently
+		// Normalize whitespace
+		String normalized = message.strip().replaceAll("\\s+", " ");
+		// record message silently (store as user typed)
 		new Command.AddMessageCommand(message).execute();
-		return buildCommand(message, /* interactive */ false);
+		return buildCommand(normalized, /* interactive */ false);
 	}
 
 	// Builds a Command for the given message. If interactive is true, user-facing

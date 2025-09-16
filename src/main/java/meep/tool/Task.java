@@ -68,11 +68,13 @@ public abstract class Task {
 				case "D" :
 					return new DeadlineTask(parts[3], parts[4], parts[2].equals("1"));
 				case "E" :
-					return new EventTask(
-							parts[3],
-							parts[4].split("-")[0],
-							parts[4].split("-")[1],
-							parts[2].equals("1"));
+					String range = parts[4];
+					if (range.length() < 21) {
+						throw new ArrayIndexOutOfBoundsException("Invalid event time range");
+					}
+					String start = range.substring(0, 10);
+					String end = range.substring(range.length() - 10);
+					return new EventTask(parts[3], start, end, parts[2].equals("1"));
 				default :
 					throw new IllegalArgumentException("Unknown task type: " + parts[1]);
 			}
@@ -90,18 +92,19 @@ public abstract class Task {
 	 */
 	public static Pair<Task, Exception> buildTask(String task) {
 		try {
-			return task.startsWith("todo ")
-					? new Pair<>(new ToDoTask(task.substring(5).trim()), null)
-					: task.startsWith("deadline ")
-							? new Pair<>(new DeadlineTask(task.substring(9).trim()), null)
-							: task.startsWith("event ")
-									? new Pair<>(new EventTask(task.substring(6).trim()), null)
-									: new Pair<>(
-											null,
-											new Exception(
-													"Specify Task Description: "
-															+ task
-															+ " <task description>"));
+			String normalized = task.strip().replaceAll("\\s+", " ");
+			if (normalized.startsWith("todo ")) {
+				String desc = normalized.substring(5).trim();
+				if (desc.isEmpty()) {
+					throw new IllegalArgumentException("Task Description cannot be null or empty");
+				}
+				return new Pair<>(new ToDoTask(desc), null);
+			} else if (normalized.startsWith("deadline ")) {
+				return new Pair<>(new DeadlineTask(normalized.substring(9).trim()), null);
+			} else if (normalized.startsWith("event ")) {
+				return new Pair<>(new EventTask(normalized.substring(6).trim()), null);
+			}
+			return new Pair<>(null, new Exception("Specify Task Description: " + task + " <task description>"));
 		} catch (Exception e) {
 			return new Pair<>(null, e);
 		}
@@ -268,12 +271,18 @@ public abstract class Task {
 		 * @return extracted deadline or empty string
 		 */
 		private static String extractDeadline(String task) {
+			int count = 0;
+			String result = "";
 			for (String command : task.split("/")) {
 				if (command.startsWith("by")) {
-					return command.substring(3).trim();
+					count++;
+					result = command.substring(3).trim();
 				}
 			}
-			return "";
+			if (count > 1) {
+				throw new IllegalArgumentException("Multiple /by parameters specified");
+			}
+			return result;
 		}
 
 		/**
@@ -283,7 +292,7 @@ public abstract class Task {
 		 *            raw command string (e.g., "deadline desc /by yyyy-MM-dd")
 		 */
 		DeadlineTask(String task) {
-			this(task.split("/", 2)[0], extractDeadline(task));
+			this(task.split("/", 2)[0].trim(), extractDeadline(task));
 		}
 
 		/**
@@ -313,6 +322,12 @@ public abstract class Task {
 			if (deadline == null || deadline.trim().isEmpty()) {
 				throw new IllegalArgumentException(
 						"Deadline cannot be null or empty: Please specify deadline time with /by");
+			}
+			// Validate date format early and reject invalid dates
+			try {
+				LocalDate.parse(deadline, inputDtf);
+			} catch (DateTimeParseException e) {
+				throw new IllegalArgumentException("Invalid date format. Please use: " + getInputDtfPattern());
 			}
 			this.deadline = deadline;
 		}
@@ -361,7 +376,7 @@ public abstract class Task {
 		 */
 		EventTask(String task) {
 			this(
-					task.split("/", 2)[0],
+					task.split("/", 2)[0].trim(),
 					EventTask.extractStartTime(task),
 					EventTask.extractEndTime(task));
 		}
@@ -404,7 +419,18 @@ public abstract class Task {
 						"Event end time cannot be null or empty: Please specify event end time with"
 								+ " /to");
 			}
-
+			// Validate dates and ensure start < end
+			LocalDate start;
+			LocalDate end;
+			try {
+				start = LocalDate.parse(eventStartTime, inputDtf);
+				end = LocalDate.parse(eventEndTime, inputDtf);
+			} catch (DateTimeParseException e) {
+				throw new IllegalArgumentException("Invalid date format. Please use: " + getInputDtfPattern());
+			}
+			if (!start.isBefore(end)) {
+				throw new IllegalArgumentException("Event start must be before end");
+			}
 			this.eventStartTime = eventStartTime;
 			this.eventEndTime = eventEndTime;
 		}
@@ -417,12 +443,18 @@ public abstract class Task {
 		 * @return extracted start time or empty string
 		 */
 		private static String extractStartTime(String task) {
+			int count = 0;
+			String result = "";
 			for (String command : task.split("/")) {
 				if (command.startsWith("from")) {
-					return command.substring(5).trim();
+					count++;
+					result = command.substring(5).trim();
 				}
 			}
-			return "";
+			if (count > 1) {
+				throw new IllegalArgumentException("Multiple /from parameters specified");
+			}
+			return result;
 		}
 
 		/**
@@ -433,12 +465,18 @@ public abstract class Task {
 		 * @return extracted end time or empty string
 		 */
 		private static String extractEndTime(String task) {
+			int count = 0;
+			String result = "";
 			for (String command : task.split("/")) {
 				if (command.startsWith("to")) {
-					return command.substring(3).trim();
+					count++;
+					result = command.substring(3).trim();
 				}
 			}
-			return "";
+			if (count > 1) {
+				throw new IllegalArgumentException("Multiple /to parameters specified");
+			}
+			return result;
 		}
 
 		/**
