@@ -40,11 +40,11 @@ public class MainWindow extends AnchorPane {
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
         // Load images with graceful fallbacks
-        userImage = loadFirstAvailable("/images/avatar.jpg", "/images/DaUser.png");
-        meepHappyImage = loadFirstAvailable("/images/happy_robot.jpg", "/images/DaMeep.png");
-        meepSadImage = loadFirstAvailable("/images/sad_robot.jpg", "/images/DaMeep.png");
-        meepTalkImage = loadFirstAvailable("/images/talk_robot.jpg", "/images/DaMeep.png");
-        meepSmileImage = loadFirstAvailable("/images/smile_robot.jpg", "/images/DaMeep.png");
+        userImage = loadFirstAvailable("/images/avatar.jpg");
+        meepHappyImage = loadFirstAvailable("/images/happy_robot.jpg");
+        meepSadImage = loadFirstAvailable("/images/sad_robot.jpg");
+        meepTalkImage = loadFirstAvailable("/images/talk_robot.jpg");
+        meepSmileImage = loadFirstAvailable("/images/smile_robot.jpg");
 
         // Background handled by CSS; nothing to wire here
     }

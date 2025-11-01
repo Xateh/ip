@@ -50,6 +50,7 @@ Commands are case-sensitive. Extra whitespace is tolerated. Date input format is
 
 - how are you?
 	- Example → `how are you?`
+	- Output → `I'm fine, thanks!`
 
 - list messages
 	- Shows the raw inputs Meep has received this session.
@@ -59,12 +60,15 @@ Commands are case-sensitive. Extra whitespace is tolerated. Date input format is
 
 - todo <description>
 	- Example → `todo buy milk`
+	- Output → `Added todo: buy milk`
 
 - deadline <description> /by <date>
 	- Example → `deadline submit report /by 2025-12-31`
+	- Output → `Added deadline: submit report (by: 2025-12-31)`
 
 - event <description> /from <start-date> /to <end-date>
 	- Example → `event conference /from 2025-04-21 /to 2025-04-23`
+	- Output → `Added event: conference (from: 2025-04-21 to: 2025-04-23)`
 
 - mark <n>
 	- Marks task number n as done (1-based index). If the number cannot be parsed, Meep prints `Invalid task number.`
@@ -81,6 +85,7 @@ Commands are case-sensitive. Extra whitespace is tolerated. Date input format is
 - check due <date>
 	- Shows tasks due before the given date.
 	- Example → `check due 2025-12-31`
+	- Output → `Tasks due before 2025-12-31:\n1. submit report (by: 2025-12-31)`
 
 - save
 	- Saves tasks to `data/meep.txt`. Parent directories are created automatically if missing.
@@ -94,20 +99,27 @@ Commands are case-sensitive. Extra whitespace is tolerated. Date input format is
 - bye
 	- Exits the CLI (GUI closes via window controls).
 
-### Example session (CLI)
+## Command summary
 
-```
-hello
-todo buy milk
-deadline submit report /by 2025-12-31
-event conference /from 2025-04-21 /to 2025-04-23
-list
-mark 2
-find report
-check due 2025-12-31
-save
-bye
-```
+A quick reference of Meep commands and their format/examples:
+
+| Action | Format, Example |
+|---|---|
+| Greet | `hello`<br>`e.g. hello` |
+| Request status | `how are you?`<br>`e.g. how are you?` |
+| Show raw inputs | `list messages`<br>`e.g. list messages` |
+| List tasks | `list`<br>`e.g. list` |
+| Add todo | `todo <description>`<br>`e.g. todo buy milk` |
+| Add deadline | `deadline <description> /by <date>`<br>`e.g. deadline submit report /by 2025-12-31` |
+| Add event | `event <description> /from <start-date> /to <end-date>`<br>`e.g. event conference /from 2025-04-21 /to 2025-04-23` |
+| Mark a task | `mark <n>`<br>`e.g. mark 1` |
+| Unmark a task | `unmark <n>`<br>`e.g. unmark 1` |
+| Delete a task | `delete <n>`<br>`e.g. delete 1` |
+| Find tasks | `find <substring>`<br>`e.g. find report` |
+| Check due | `check due <date>`<br>`e.g. check due 2025-12-31` |
+| Save / Load | `save` / `load`<br>`e.g. save` |
+| Help | `help`<br>`e.g. help` |
+| Exit | `bye`<br>`e.g. bye` |
 
 ## Persistence
 

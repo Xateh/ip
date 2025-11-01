@@ -118,3 +118,11 @@ Notes:
 See also:
 - User Guide: `docs/README.md`
 - Testing & Debugging: `docs/TESTING.md`
+
+# Acknowledgements
+
+## Image Sources
+- `bg_img_wide.jpeg`: [Source](https://wallpapercave.com/wp/wp10724302.jpg)
+- `bg_img.jpg`: [Source](https://preview.redd.it/exodus-by-dpcdpc11-5120x2880-v0-ac8enliwpr9a1.png?auto=webp&s=a13ea3f0e45685e081531df24f1f2da83c986b8c)
+- `avatar.jpg`: [Source](https://elements.envato.com/flat-cartoon-diverse-avatars-C7BUBG2)
+- `happy_robot.jpg`, `sad_robot.jpg`, `smile_robot.jpg`, `talk_robot.jpg`: [Source](https://media.istockphoto.com/id/924845580/vector/cute-robot-face-set.jpg?s=612x612&w=0&k=20&c=WgGJne9BZ9YQ95dGVrcrdbhZojKTQusJXXvKlhpr8zM=)
